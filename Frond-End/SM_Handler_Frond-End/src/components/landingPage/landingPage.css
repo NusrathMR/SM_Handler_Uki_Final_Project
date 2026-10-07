@@ -385,3 +385,11 @@ ul {
 .footer-links a:hover {
   color: #000;
 }
+
+.btn {
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+.btn:hover {
+  transform: scale(1.03);
+}

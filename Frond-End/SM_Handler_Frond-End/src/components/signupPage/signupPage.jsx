@@ -56,7 +56,7 @@ function signupPage(){
 
                         <label for="password">PASSWORD</label>
                         <div class="su-field">
-                        <input type="password" id="password" value="password123"/>
+                        <input type="password" id="password" placeholder="password123"/>
                         <span class="su-field-icon">&#9673;</span>
                         </div>
 
@@ -77,7 +77,7 @@ function signupPage(){
 
                         <label for="confirm">CONFIRM PASSWORD</label>
                         <div class="su-field">
-                        <input type="password" id="confirm" value="password123"/>
+                        <input type="password" id="confirm" placeholder="password123"/>
                         <span class="su-field-icon">&#9673;</span>
                         </div>
 

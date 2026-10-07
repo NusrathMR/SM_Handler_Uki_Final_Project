@@ -363,3 +363,11 @@ form input[type="password"] {
 .right-footer a {
   margin-left: 24px;
 }
+
+button {
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}

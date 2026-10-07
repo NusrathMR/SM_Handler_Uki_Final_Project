@@ -1,6 +1,13 @@
 import "./loginPage.css";
+import { useState } from "react";
+import ForgotPasswordModal from "../forgetPassword/forgetPassword.jsx";
+
 
 function LoginPage(){
+
+    const [showForgot, setShowForgot] = useState(false);
+
+
     return(
         <>
           <div class="login-page">
@@ -101,7 +108,15 @@ function LoginPage(){
                     <label class="remember">
                         <input type="checkbox" checked /> Remember me
                     </label>
-                    <a href="#">Forgot password?</a>
+                    <a href="#" 
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setShowForgot(true);
+                        }}>Forgot password?</a>
+
+                        {showForgot && (
+                            <ForgotPasswordModal onClose={() => setShowForgot(false)} />
+                        )}
                     </div>
 
                     <button type="submit" class="login-btn">Log In</button>

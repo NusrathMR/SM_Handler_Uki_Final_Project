@@ -1,8 +1,11 @@
-import "./landingPage.css"
+import "./landingPage.css";
+
 
 function LandingPage(){
     return(
         <>
+
+            {/* --navigation bar section-- */}
             <header class="navbar">
                 <div class="container nav-inner">
                     <div class="brand">
@@ -12,19 +15,20 @@ function LandingPage(){
                     </div>
 
                     <nav class="nav-links">
-                    <a href="#" class="active">Features</a>
-                    <a href="#">Pipeline</a>
-                    <a href="#">Channels</a>
-                    <a href="#">Pricing</a>
+                    <a href="" class="active">Features</a>
+                    <a href="">Pipeline</a>
+                    <a href="#channels">Channels</a>
+                    <a href="">Pricing</a>
                     </nav>
 
                     <div class="nav-actions">
-                    <a href="#" class="btn btn-light">Login</a>
-                    <a href="#" class="btn btn-dark">Sign Up</a>
+                    <a href="login" class="btn btn-light">Login</a>
+                    <a href="signup" class="btn btn-dark">Sign Up</a>
                     </div>
                 </div>
             </header>
 
+            {/* --hero page section-- */}
             <main class="hero">
                 <div class="badge">&lsaquo; Autonomous Multi-Channel Content Suite v2.4</div>
 
@@ -36,7 +40,7 @@ function LandingPage(){
 
                 <div class="hero-buttons">
                     <a href="#" class="btn btn-dark btn-large">Get Started &rarr;</a>
-                    <a href="#" class="btn btn-light btn-large">Log In</a>
+                    <a href="login" class="btn btn-light btn-large">Log In</a>
                 </div>
 
                 <ul class="hero-notes">
@@ -46,7 +50,7 @@ function LandingPage(){
                 </ul>
             </main>
 
-            <section class="channels">
+            <section class="channels" id="channels">
             <p class="channels-title">MANAGE CONTENT ACROSS YOUR CONNECTED CHANNELS</p>
 
             <ul class="channel-list">
@@ -60,6 +64,7 @@ function LandingPage(){
             </ul>
             </section>
 
+            {/* --Features section-- */}
             <section class="features">
             <div class="features-inner">
                 <h2>Designed for high-output growth teams.</h2>
@@ -90,6 +95,7 @@ function LandingPage(){
             </div>
             </section>
 
+            {/* --navigate to pricing section-- */}
             <section class="cta">
             <div class="cta-box">
                 <h2>Ready to simplify your social media workflow?</h2>
@@ -102,6 +108,7 @@ function LandingPage(){
             </div>
             </section>
 
+            {/* --footer section-- */}
             <footer class="footer">
             <div class="footer-inner">
                 <div class="footer-left">

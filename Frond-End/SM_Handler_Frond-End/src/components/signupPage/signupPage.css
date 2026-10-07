@@ -354,3 +354,11 @@ ul {
 .su-right-footer a {
   margin-right: 14px;
 }
+
+button {
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
