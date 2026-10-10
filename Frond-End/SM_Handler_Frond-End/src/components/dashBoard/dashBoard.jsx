@@ -20,7 +20,7 @@ function DashBoard(){
 
                     <nav class="db-menu">
                         <a href="#" class="active">⌂ Home</a>
-                        <a href="#">✎ Create</a>
+                        <a href="createpage">✎ Create</a>
                         <a href="#">▦ Publish</a>
                         <a href="#">▣ Templates</a>
                         <a href="#">▬ Pricing</a>
@@ -39,7 +39,7 @@ function DashBoard(){
                     <div class="db-user-card">
                         <span class="db-avatar-light">MA</span>
                         <div>
-                        <strong>M. R. Nusrat Ahmed</strong>
+                        <strong>M. R. Nusrath Ahamed</strong>
                         <small>Free Plan</small>
                         </div>
                         <span class="db-dots">⋮</span>
@@ -53,7 +53,7 @@ function DashBoard(){
                     {/* <!-- Top bar --> */}
                     <header class="db-topbar">
                     <div>
-                        <h1>Good morning, Nusrat 👋</h1>
+                        <h1>Good morning, Nusrath 👋</h1>
                         <p>Create. Edit. Publish. Grow. All in one place.</p>
                     </div>
                     <div class="db-top-actions">

@@ -39,7 +39,7 @@ function LandingPage(){
                 </p>
 
                 <div class="hero-buttons">
-                    <a href="#" class="btn btn-dark btn-large">Get Started &rarr;</a>
+                    <a href="dashboard" class="btn btn-dark btn-large">Get Started &rarr;</a>
                     <a href="login" class="btn btn-light btn-large">Log In</a>
                 </div>
 

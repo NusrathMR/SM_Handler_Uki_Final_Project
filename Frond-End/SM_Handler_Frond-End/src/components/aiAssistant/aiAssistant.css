@@ -1,0 +1,394 @@
+/* Dark blurred background */
+.ai-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+/* White popup box */
+.ai-modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 10px;
+}
+
+/* ---------- Header ---------- */
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+}
+
+.ai-logo {
+  width: 36px;
+  height: 36px;
+  background: #000;
+  color: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-title {
+  flex: 1;
+}
+
+.ai-title h2 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ai-version {
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 400;
+  background: #f1f1f2;
+  border: 1px solid #e5e5e5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+.ai-title p {
+  font-size: 11px;
+  color: #777;
+  margin-top: 2px;
+}
+
+.ai-credits {
+  font-size: 10px;
+  font-weight: 500;
+  background: #f4f4f5;
+  border: 1px solid #e5e5e5;
+  padding: 7px 12px;
+  border-radius: 20px;
+}
+
+.ai-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #444;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+/* ---------- Context bar ---------- */
+.ai-context {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 24px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.ai-working {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #444;
+  flex-shrink: 0;
+}
+
+.ai-working small {
+  max-width: 130px;
+  font-size: 10px;
+  color: #888;
+}
+
+.ai-green-dot {
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+
+.ai-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.ai-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.ai-chips button {
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ai-chips button:hover {
+  border-color: #000;
+  background: #f4f4f5;
+}
+
+/* ---------- Chat area ---------- */
+.ai-chat {
+  flex: 1;
+  overflow-y: auto;
+  background: #fafafa;
+  padding: 24px;
+}
+
+/* User message */
+.ai-user-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.ai-bubble {
+  max-width: 370px;
+  background: #111;
+  color: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ai-user-msg small {
+  font-size: 9px;
+  color: #999;
+  margin-top: 6px;
+}
+
+/* AI reply */
+.ai-reply {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.ai-reply-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.ai-mini-logo {
+  width: 22px;
+  height: 22px;
+  background: #000;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-reply-head strong {
+  font-size: 11px;
+}
+
+.ai-reply-head small {
+  font-size: 10px;
+  color: #999;
+}
+
+.ai-reply-tools {
+  margin-left: auto;
+}
+
+.ai-reply-tools button {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.ai-intro {
+  font-size: 11px;
+  color: #444;
+  margin-bottom: 14px;
+}
+
+/* Option card */
+.ai-option {
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.ai-option-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.ai-recommended {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 3px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+
+.ai-option-head strong {
+  font-size: 11px;
+}
+
+.ai-option-head small {
+  color: #888;
+}
+
+.ai-option > p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.ai-option .ai-tags {
+  font-weight: 600;
+}
+
+.ai-option-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.ai-btn-dark,
+.ai-btn-light {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ai-btn-dark {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+}
+
+.ai-btn-light {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+}
+
+.ai-adapt {
+  margin-left: auto;
+  font-size: 10px;
+  color: #777;
+}
+
+/* ---------- Input area ---------- */
+.ai-input-area {
+  padding: 14px 24px 20px;
+  border-top: 1px solid #eee;
+  background: #fff;
+}
+
+.ai-input-box {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.ai-input-box textarea {
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.ai-input-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.ai-input-left,
+.ai-input-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-icon-btn,
+.ai-plain {
+  background: none;
+  border: none;
+  font-size: 10px;
+  color: #555;
+  cursor: pointer;
+}
+
+.ai-select {
+  background: #f4f4f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.ai-input-right span {
+  font-size: 9px;
+  color: #aaa;
+}
+
+.ai-send {
+  width: 28px;
+  height: 28px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
