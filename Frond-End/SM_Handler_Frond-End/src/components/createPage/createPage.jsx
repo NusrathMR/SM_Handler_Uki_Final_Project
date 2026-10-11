@@ -1,11 +1,21 @@
 import "./createPage.css"
 import { useState } from "react";
 import AIAssistantModal from "../aiAssistant/aiAssistant.jsx"
+import ScheduleModal from "../scheduleModel/scheduleModel.jsx";
+
+
 
 function CreatePage(){
 
       const [showAI, setShowAI] = useState(false)
       const [caption, setCaption] = useState("")
+      const [showSchedule, setShowSchedule] = useState(false)
+
+      function handleContinue(scheduleData) {
+            console.log("Schedule data:", scheduleData);
+            setShowSchedule(false);
+            // go to the Publish page here (see Step 4)
+        }
   
     return(
         <>
@@ -27,7 +37,7 @@ function CreatePage(){
                     <nav class="db-menu">
                         <a href="dashboard">⌂ Home</a>
                         <a href="#" class="active">✎ Create</a>
-                        <a href="#">▦ Publish</a>
+                        <a href="publishpage">▦ Publish</a>
                         <a href="#">▣ Templates</a>
                         <a href="#">▬ Pricing</a>
                     </nav>
@@ -198,7 +208,19 @@ function CreatePage(){
                             <span class="cr-s"><b>04</b> Preview ›</span>
                             <span class="cr-s"><b>05</b> Publish / Schedule</span>
                         </div>
-                        <a href="#" class="cr-next">Next &rarr;</a>
+                        <a href="#" class="cr-next" onClick={(e) => {
+                            e.preventDefault();
+                            setShowSchedule(true);
+                            }}>Next &rarr;</a>
+
+                                  {showSchedule && (
+                                        <ScheduleModal
+                                        postTitle={caption}
+                                        onClose={() => setShowSchedule(false)}
+                                        onBack={() => setShowSchedule(false)}
+                                        onContinue={handleContinue}
+                                        />
+                                    )}
                         </div>
                     </div>
 

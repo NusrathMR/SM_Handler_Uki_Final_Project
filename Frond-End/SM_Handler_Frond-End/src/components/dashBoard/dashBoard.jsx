@@ -21,7 +21,7 @@ function DashBoard(){
                     <nav class="db-menu">
                         <a href="#" class="active">⌂ Home</a>
                         <a href="createpage">✎ Create</a>
-                        <a href="#">▦ Publish</a>
+                        <a href="publishpage">▦ Publish</a>
                         <a href="#">▣ Templates</a>
                         <a href="#">▬ Pricing</a>
                     </nav>

@@ -1,0 +1,178 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", Arial, sans-serif;
+  color: #000;
+  background: #fafafa;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Page layout: sidebar on the left, page content on the right */
+.db-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.db-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: #000;
+  color: #fff;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+/* Brand */
+.db-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  margin-bottom: 24px;
+}
+
+.db-logo {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  color: #000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.db-brand strong {
+  display: block;
+  font-size: 17px;
+}
+
+.db-brand small {
+  font-size: 10px;
+  color: #aaa;
+}
+
+/* Create New button */
+.db-create-btn {
+  display: block;
+  background: #fff;
+  color: #000;
+  text-align: center;
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 22px;
+  transition: background 0.2s ease;
+}
+
+.db-create-btn:hover {
+  background: #e8e6ec;
+}
+
+/* Menu */
+.db-menu a {
+  display: block;
+  padding: 11px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #ddd;
+  margin-bottom: 4px;
+  transition: background 0.2s ease;
+}
+
+.db-menu a:hover {
+  background: #1a1a1a;
+}
+
+.db-menu a.active {
+  background: #e8e6ec;
+  color: #000;
+  font-weight: 600;
+}
+
+/* Connected channels */
+.db-channels-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #aaa;
+  padding: 0 8px;
+  margin-bottom: 12px;
+}
+
+.db-channel-icons {
+  display: flex;
+  gap: 8px;
+  padding: 0 8px;
+  margin-bottom: 20px;
+}
+
+.db-channel-icons i {
+  width: 28px;
+  height: 28px;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 50%;
+  font-style: normal;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* User card */
+.db-user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.db-user-card div {
+  flex: 1;
+}
+
+.db-user-card strong {
+  display: block;
+  font-size: 12px;
+}
+
+.db-user-card small {
+  font-size: 10px;
+  color: #aaa;
+}
+
+.db-avatar-light {
+  width: 32px;
+  height: 32px;
+  background: #e8e6ec;
+  color: #000;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.db-dots {
+  color: #aaa;
+}

@@ -6,6 +6,7 @@ import LoginPage from './components/loginPage/loginPage.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import DashBoard from './components/dashBoard/dashBoard.jsx'
 import CreatePage from './components/createPage/createPage.jsx'
+import PublishPage from './components/publishPage/publishPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path:"/createpage",
     element:<CreatePage/>
+  },
+    {
+    path:"/publishpage",
+    element:<PublishPage/>
   }
 ])
 
