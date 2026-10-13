@@ -12,6 +12,7 @@ export const createUser = async (req,res)=>{
 
         const saveUser = await userData.save();
         res.status(200).json(saveUser)
+
     }catch(error){
         console.error(error)
         res.status(500).json({error: "Internal server Error..."})
