@@ -76,4 +76,4 @@ const User = mongoose.model("User", userSchema);
 
 export default User;
 
-//becrypt #ing
+//bcrypt #ing

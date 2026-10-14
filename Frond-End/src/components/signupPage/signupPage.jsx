@@ -44,13 +44,13 @@ function signupPage(){
                     <form>
                         <label for="name">FULL NAME</label>
                         <div class="su-field">
-                        <input type="text" id="name" value="Nusrat Ahmed"/>
+                        <input type="text" id="name" placeholder="alex"/>
                         <span class="su-field-icon">&#9786;</span>
                         </div>
 
                         <label for="email">EMAIL ADDRESS</label>
                         <div class="su-field">
-                        <input type="email" id="email" value="nusrat@socialynk.io"/>
+                        <input type="email" id="email" placeholder="alex@socialynk.io"/>
                         <span class="su-field-icon">&#9993;</span>
                         </div>
 
