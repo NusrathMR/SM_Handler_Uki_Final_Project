@@ -1,0 +1,399 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Left panel ---------- */
+.left-panel {
+  width: 45%;
+  background: #111;
+  color: #fff;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.left-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.left-logo {
+  width: 38px;
+  height: 38px;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.left-brand-name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.left-tag {
+  font-size: 10px;
+  background: #222;
+  border: 1px solid #333;
+  color: #aaa;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.left-panel h1 {
+  font-size: 48px;
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -1.5px;
+}
+
+.left-panel .muted {
+  color: #888;
+}
+
+.left-text {
+  margin: 24px 0 40px;
+  max-width: 420px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #bbb;
+}
+
+/* Flow box */
+.flow-box {
+  max-width: 420px;
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.flow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.green-dot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+
+.delivery {
+  font-family: monospace;
+  font-size: 10px;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #1a1a1a;
+  border: 1px solid #262626;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.step.active {
+  border-color: #555;
+  background: #202020;
+}
+
+.step-num {
+  width: 24px;
+  height: 24px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+
+.step-text {
+  flex: 1;
+}
+
+.step-text strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.step-text em {
+  font-style: normal;
+  font-size: 9px;
+  background: #111;
+  border: 1px solid #333;
+  padding: 1px 5px;
+  margin-left: 4px;
+}
+
+.step-text small {
+  font-size: 11px;
+  color: #999;
+}
+
+.step-icon {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.mini-tags {
+  display: flex;
+  gap: 4px;
+}
+
+.mini-tags b {
+  font-size: 9px;
+  background: #222;
+  border: 1px solid #444;
+  padding: 3px 5px;
+  border-radius: 3px;
+}
+
+.left-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #2a2a2a;
+  padding-top: 28px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* ---------- Right panel ---------- */
+.right-panel {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 60px 30px;
+}
+
+.form-wrap {
+  width: 100%;
+  max-width: 394px;
+  margin: 100px auto 0;
+}
+
+.form-wrap h2 {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.form-sub {
+  margin: 10px 0 36px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+}
+
+form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+form input[type="email"],
+form input[type="password"] {
+  width: 100%;
+  height: 43px;
+  padding: 0 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.password-box {
+  position: relative;
+}
+
+.eye {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  color: #888;
+  font-size: 14px;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 15px;
+}
+
+.form-row .remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.login-btn {
+  width: 100%;
+  height: 49px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.or-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 28px 0;
+  color: #888;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.or-line::before,
+.or-line::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e5e5;
+}
+
+.social-btn {
+  width: 100%;
+  height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 15px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.g-icon {
+  color: #4285f4;
+}
+
+.f-icon {
+  width: 16px;
+  height: 16px;
+  background: #1877f2;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-text {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 15px;
+  color: #666;
+}
+
+.signup-text a {
+  color: #000;
+  font-weight: 600;
+}
+
+/* Right footer */
+.right-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #eee;
+  padding-top: 28px;
+  margin-top: 60px;
+  font-size: 12px;
+  color: #888;
+}
+
+.right-footer a {
+  margin-left: 24px;
+}
+
+button {
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+
+/* Response message under Confirm Password */
+.su-message {
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+
+}
+
+/* 200 / 201: green */
+.su-message.success {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+/* 400 / 500: red */
+.su-message.error {
+  color: #991b1b;
+  background: #fee2e2;
+  border-color: #fca5a5;
+}

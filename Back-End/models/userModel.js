@@ -1,24 +1,13 @@
-
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    fullname: {
       type: String,
       required: true,
       trim: true,
       minlength: 2,
       maxlength: 100,
-    },
-
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-      minlength: 3,
-      maxlength: 30,
     },
 
     email: {
@@ -70,10 +59,8 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
-);
+)
 
 const User = mongoose.model("User", userSchema);
 
 export default User;
-
-//bcrypt #ing
