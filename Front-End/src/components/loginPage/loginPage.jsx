@@ -1,6 +1,8 @@
 import "./loginPage.css";
 import { useState } from "react";
 import ForgotPasswordModal from "../forgetPassword/forgetPassword.jsx";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext/authContext.jsx";
 
 
 function LoginPage(){
@@ -11,6 +13,10 @@ function LoginPage(){
     const [showForgot, setShowForgot] = useState(false);
     const [status,setStatus] = useState(0)
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const {login} = useAuth()
+    const navigate = useNavigate()
+
 
     const handleSignIn = async (event)=>{
         event.preventDefault()
@@ -24,14 +30,22 @@ function LoginPage(){
                 
             })
 
+            
+
             const replay = await response.json()
+            console.log("TOKEN:", replay.token)
+            console.log("USER:", replay.user)
             setMessage(replay.message)
 
-            if(replay.status === 200){
+            if(response.ok){
+            
+                login(replay.token, replay.user )
+                navigate("/dashboard", { replace: true })
 
-                localStorage.setItem("token", replay.token)
-                setEmail(null)
-                setPassword(null)
+                // setEmail(null)
+                // setPassword(null)
+
+                
             }
 
             setStatus(response.status)
@@ -39,6 +53,8 @@ function LoginPage(){
         }catch(error){
             setMessage(`Server error ${error}`)
             console.error(error)
+        }finally{
+            setIsSubmitting(false)
         }
     }
 
