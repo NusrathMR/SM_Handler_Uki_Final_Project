@@ -9,36 +9,6 @@
   font-size: 11px;
 }
 
-/* Top bar */
-.cr-topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  border-bottom: 1px solid #e5e5e5;
-  padding: 14px 20px;
-}
-
-.cr-topbar h1 {
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.cr-topbar p {
-  font-size: 11px;
-  color: #777;
-  margin-top: 3px;
-}
-
-.cr-search {
-  width: 160px;
-  background: #f1f1f2;
-  border-radius: 6px;
-  padding: 9px 12px;
-  font-size: 11px;
-  color: #999;
-}
-
 /* Body layout */
 .cr-body {
   display: grid;
@@ -620,4 +590,3 @@
   color: #fff;
   border-color: #000;
 }
-

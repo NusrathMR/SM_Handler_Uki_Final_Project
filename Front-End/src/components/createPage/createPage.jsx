@@ -1,6 +1,7 @@
 import "./createPage.css"
 import { useState } from "react";
 import Sidebar from "../sideBar/sidebar.jsx";
+import TopBar from "../topBar/topBar.jsx";
 import AIAssistantModal from "../aiAssistant/aiAssistant.jsx"
 import ScheduleModal from "../scheduleModel/scheduleModel.jsx";
 
@@ -27,18 +28,10 @@ function CreatePage(){
                 {/* <!-- Main --> */}
                 <div class="cr-wrap">
 
-                    {/* <!-- Top bar --> */}
-                    <header class="cr-topbar">
-                    <div>
-                        <h1>Create Content</h1>
-                        <p>Turn your ideas into amazing posts with AI.</p>
-                    </div>
-                    <div class="db-top-actions">
-                        <div class="cr-search">⌕ Search anything...</div>
-                        <span class="db-bell">🔔</span>
-                        <span class="db-avatar-dark">MA</span>
-                    </div>
-                    </header>
+                    <TopBar
+                        title="Create Content"
+                        subtitle="Turn your ideas into amazing posts with AI."
+                    />
 
                     <div class="cr-body">
 

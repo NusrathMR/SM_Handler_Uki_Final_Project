@@ -1,9 +1,12 @@
 import "./dashBoard.css"
 import Sidebar from "../sideBar/sidebar.jsx";
+import TopBar from "../topBar/topBar.jsx";
 
 function DashBoard(){
     return(
         <>
+
+        
             <div className="db-layout">
 
                 <Sidebar />
@@ -11,21 +14,11 @@ function DashBoard(){
                 {/* <!-- Main --> */}
                 <main class="db-main">
 
-                    {/* <!-- Top bar --> */}
-                    <header class="db-topbar">
-                    <div>
-                        <h1>Good morning, Nusrath 👋</h1>
-                        <p>Create. Edit. Publish. Grow. All in one place.</p>
-                    </div>
-                    <div class="db-top-actions">
-                        <div class="db-search">
-                        <span>⌕ Search anything...</span>
-                        <kbd>⌘K</kbd>
-                        </div>
-                        <span class="db-bell">🔔</span>
-                        <span class="db-avatar-dark">NA</span>
-                    </div>
-                    </header>
+                    <TopBar
+                        title="Good morning, Nusrath 👋"
+                        subtitle="Create. Edit. Publish. Grow. All in one place."
+                        searchShortcut="⌘K"
+                    />
 
                     {/* <!-- Stats --> */}
                     <section class="db-stats">

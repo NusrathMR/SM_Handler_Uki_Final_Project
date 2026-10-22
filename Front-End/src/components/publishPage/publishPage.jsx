@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Sidebar from "../sideBar/sidebar.jsx";
+import TopBar from "../topBar/topBar.jsx";
 import "./publishPage.css";
 
 const tabs = ["Schedule", "Drafts", "Approvals", "Sent"];
@@ -84,26 +85,13 @@ function PublishPage() {
 
       <div className="pb-wrap">
 
-        {/* Top bar */}
-        <header className="pb-topbar">
-          <div className="pb-title">
-            <span className="pb-title-icon">▷</span>
-            <div>
-              <h1>Publish</h1>
-              <p>Schedule your content and reach your audience across multiple platforms.</p>
-            </div>
-          </div>
-          <div className="db-top-actions">
-            <input
-              className="pb-search"
-              placeholder="Search scheduled posts..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <span className="db-bell">🔔</span>
-            <span className="db-avatar-light pb-avatar">MA</span>
-          </div>
-        </header>
+        <TopBar
+          title="Publish"
+          subtitle="Schedule your content and reach your audience across multiple platforms."
+          titleIcon="▷"
+          searchValue={search}
+          onSearchChange={setSearch}
+        />
 
         {/* Tabs */}
         <nav className="pb-tabs">

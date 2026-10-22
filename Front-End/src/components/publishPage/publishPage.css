@@ -5,70 +5,6 @@
   background: #fafafa;
 }
 
-/* Top bar */
-.pb-topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  padding: 14px 20px;
-}
-
-.pb-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.pb-title-icon {
-  width: 36px;
-  height: 36px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pb-title h1 {
-  font-size: 17px;
-  font-weight: 600;
-}
-
-.pb-title p {
-  font-size: 11px;
-  color: #777;
-  margin-top: 2px;
-}
-
-.pb-search {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 30px;
-  width: 220px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 11px;
-  color: #777;
-}
-
-.pb-search kbd {
-  background: #eee;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 9px;
-}
-
-.pb-avatar {
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-}
-
 /* Tabs */
 .pb-tabs {
   display: flex;
@@ -613,11 +549,6 @@
   font-size: 9px;
   color: #777;
   line-height: 1.5;
-}
-
-input.pb-search {
-  font-family: inherit;
-  outline: none;
 }
 
 .pb-empty {

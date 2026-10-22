@@ -4,82 +4,12 @@
   padding: 24px 32px 40px;
 }
 
-/* Top bar */
-.db-topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 28px;
-}
-
-.db-topbar h1 {
-  font-size: 24px;
-  font-weight: 600;
-}
-
-.db-topbar p {
-  font-size: 12px;
-  color: #777;
-  margin-top: 4px;
-}
-
-.db-top-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.db-search {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 40px;
-  width: 260px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: #777;
-}
-
-.db-search kbd {
-  background: #eee;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 10px;
-}
-
-.db-bell {
-  width: 36px;
-  height: 36px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-}
-
-.db-avatar-dark {
-  width: 36px;
-  height: 36px;
-  background: #000;
-  color: #fff;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Stats */
 .db-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  margin-top: 28px;
   margin-bottom: 36px;
 }
 
@@ -126,13 +56,13 @@
 }
 
 .db-stat h2 {
-  font-size: 34px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .db-stat p {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   margin: 2px 0 12px;
 }
 
@@ -146,7 +76,7 @@
   background: #f4f4f5;
   border: 1px solid #e5e5e5;
   color: #000;
-  font-size: 10px;
+  font-size: 9px;
   padding: 3px 6px;
   border-radius: 4px;
   margin-right: 4px;
@@ -236,19 +166,19 @@
 }
 
 .db-step-num {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 600;
-  color: #ccc;
+  color: #000;
 }
 
 .db-step h4 {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
   margin-bottom: 6px;
 }
 
 .db-step p {
-  font-size: 12px;
+  font-size: 10px;
   line-height: 1.5;
   color: #777;
   margin-bottom: 16px;
@@ -261,7 +191,7 @@
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 10px;
-  font-size: 12px;
+  font-size: 11px;
   margin-bottom: 14px;
 }
 
@@ -296,7 +226,7 @@
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 10px;
-  font-size: 12px;
+  font-size: 11px;
   margin-bottom: 14px;
 }
 
@@ -359,18 +289,20 @@
 
 .db-comment-text strong {
   font-size: 12px;
+  font-weight: 600;
   color: #000;
 }
 
 .db-comment-text small {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 400;
   color: #888;
   margin-left: 4px;
 }
 
 .db-comment-text p {
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.6;
   color: #000;
   margin-top: 4px;
 }
@@ -395,27 +327,27 @@
   bottom: 10px;
   background: rgba(0, 0, 0, 0.75);
   color: #fff;
-  font-size: 10px;
+  font-size: 9px;
   padding: 4px 8px;
   border-radius: 4px;
 }
 
 .db-box h5 {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   margin-bottom: 6px;
 }
 
 .db-post-text {
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 11px;
+  line-height: 1.6;
   color: #777;
   margin-bottom: 14px;
 }
 
 .db-post-date {
-  font-size: 12px;
-  color: #555;
+  font-size: 10px;
+  color: #666;
   padding-bottom: 16px;
   margin-bottom: 16px;
   border-bottom: 1px solid #eee;
