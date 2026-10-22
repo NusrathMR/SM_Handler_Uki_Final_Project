@@ -80,7 +80,7 @@ function PublishPage() {
 
   return (
     <div className="db-layout">
-      <Sidebar active="Publish" />
+      <Sidebar />
 
       <div className="pb-wrap">
 

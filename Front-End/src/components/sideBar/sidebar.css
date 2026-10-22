@@ -1,16 +1,11 @@
-* {
+.app-sidebar,
+.app-sidebar * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family: "Inter", Arial, sans-serif;
-  color: #000;
-  background: #fafafa;
-}
-
-a {
+.app-sidebar a {
   text-decoration: none;
   color: inherit;
 }
@@ -19,14 +14,18 @@ a {
 .db-layout {
   display: flex;
   min-height: 100vh;
+  font-family: "Inter", Arial, sans-serif;
+  color: #000;
+  background: #fafafa;
 }
 
 /* ---------- Sidebar ---------- */
-.db-sidebar {
+.app-sidebar {
   width: 260px;
   flex-shrink: 0;
   background: #000;
   color: #fff;
+  font-family: "Inter", Arial, sans-serif;
   padding: 20px 12px;
   display: flex;
   flex-direction: column;
@@ -37,7 +36,7 @@ a {
 }
 
 /* Brand */
-.db-brand {
+.app-sidebar .db-brand {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -45,7 +44,7 @@ a {
   margin-bottom: 24px;
 }
 
-.db-logo {
+.app-sidebar .db-logo {
   width: 36px;
   height: 36px;
   background: #fff;
@@ -56,18 +55,18 @@ a {
   justify-content: center;
 }
 
-.db-brand strong {
+.app-sidebar .db-brand strong {
   display: block;
   font-size: 17px;
 }
 
-.db-brand small {
+.app-sidebar .db-brand small {
   font-size: 10px;
   color: #aaa;
 }
 
 /* Create New button */
-.db-create-btn {
+.app-sidebar .db-create-btn {
   display: block;
   background: #fff;
   color: #000;
@@ -80,12 +79,12 @@ a {
   transition: background 0.2s ease;
 }
 
-.db-create-btn:hover {
+.app-sidebar .db-create-btn:hover {
   background: #e8e6ec;
 }
 
 /* Menu */
-.db-menu a {
+.app-sidebar .db-menu a {
   display: block;
   padding: 11px 12px;
   border-radius: 8px;
@@ -95,18 +94,18 @@ a {
   transition: background 0.2s ease;
 }
 
-.db-menu a:hover {
+.app-sidebar .db-menu a:hover {
   background: #1a1a1a;
 }
 
-.db-menu a.active {
+.app-sidebar .db-menu a.active {
   background: #e8e6ec;
   color: #000;
   font-weight: 600;
 }
 
 /* Connected channels */
-.db-channels-head {
+.app-sidebar .db-channels-head {
   display: flex;
   justify-content: space-between;
   font-size: 10px;
@@ -115,14 +114,14 @@ a {
   margin-bottom: 12px;
 }
 
-.db-channel-icons {
+.app-sidebar .db-channel-icons {
   display: flex;
   gap: 8px;
   padding: 0 8px;
   margin-bottom: 20px;
 }
 
-.db-channel-icons i {
+.app-sidebar .db-channel-icons i {
   width: 28px;
   height: 28px;
   background: #222;
@@ -136,7 +135,7 @@ a {
 }
 
 /* User card */
-.db-user-card {
+.app-sidebar .db-user-card {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -146,21 +145,21 @@ a {
   padding: 10px;
 }
 
-.db-user-card div {
+.app-sidebar .db-user-card div {
   flex: 1;
 }
 
-.db-user-card strong {
+.app-sidebar .db-user-card strong {
   display: block;
   font-size: 12px;
 }
 
-.db-user-card small {
+.app-sidebar .db-user-card small {
   font-size: 10px;
   color: #aaa;
 }
 
-.db-avatar-light {
+.app-sidebar .db-avatar-light {
   width: 32px;
   height: 32px;
   background: #e8e6ec;
@@ -173,6 +172,6 @@ a {
   justify-content: center;
 }
 
-.db-dots {
+.app-sidebar .db-dots {
   color: #aaa;
 }

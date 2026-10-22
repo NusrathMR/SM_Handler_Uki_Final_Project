@@ -1,18 +1,19 @@
 import "./sidebar.css"
+import { Link, NavLink } from "react-router-dom";
 
 const links = [
-  { name: "Home", icon: "⌂", to: "dashboard" },
-  { name: "Create", icon: "✎", to: "createpage" },
-  { name: "Publish", icon: "▦" },
+  { name: "Home", icon: "⌂", to: "/dashboard" },
+  { name: "Create", icon: "✎", to: "/createpage" },
+  { name: "Publish", icon: "▦", to: "/publishpage" },
   { name: "Templates", icon: "▣" },
   { name: "Pricing", icon: "▬" },
 ];
 
 const channels = ["◎", "👍", "#", "▣", "♪", "▶"];
 
-function Sidebar({ active }) {
+function Sidebar() {
   return (
-    <aside className="db-sidebar">
+    <aside className="app-sidebar">
       <div>
         {/* Brand */}
         <div className="db-brand">
@@ -23,18 +24,24 @@ function Sidebar({ active }) {
           </div>
         </div>
 
-        <a href="#" className="db-create-btn">+ Create New</a>
+        <Link to="/createpage" className="db-create-btn">+ Create New</Link>
 
         {/* Menu */}
         <nav className="db-menu">
           {links.map((link) => (
-            <a
-              key={link.name}
-              href="#"
-              className={active === link.name ? "active" : ""}
-            >
-              {link.icon} {link.name}
-            </a>
+            link.to ? (
+              <NavLink key={link.name} to={link.to}>
+                {link.icon} {link.name}
+              </NavLink>
+            ) : (
+              <Link
+                key={link.name}
+                to="#"
+                onClick={(event) => event.preventDefault()}
+              >
+                {link.icon} {link.name}
+              </Link>
+            )
           ))}
         </nav>
       </div>

@@ -90,5 +90,19 @@ export const userSignIn = async (req,res)=>{
         res.status(500).json({error:"Internal server error..."})
         console.error(error)
     }
+}
 
+export const getMe = async (req, res) =>{
+    res.status(200).json({
+        user:{
+            id:req.user._id,
+            email:req.user.email,
+            role: req.user.role,
+            plan:req.user.plan,
+            profilePicture:req.user.profilePicture,
+            isEmailVerified: req.user.isEmailVerified,
+            lastLoginAt: req.user.lastLoginAt,
+            createdAt: req.user.createdAt,
+        }
+    })
 }

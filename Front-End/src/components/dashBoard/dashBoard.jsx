@@ -1,51 +1,12 @@
 import "./dashBoard.css"
+import Sidebar from "../sideBar/sidebar.jsx";
 
 function DashBoard(){
     return(
         <>
-            <div class="db-layout">
+            <div className="db-layout">
 
-                {/* <!-- Sidebar --> */}
-                <aside class="db-sidebar">
-                    <div>
-                    <div class="db-brand">
-                        <span class="db-logo">✦</span>
-                        <div>
-                        <strong>Socialynk</strong>
-                        <small>ENTERPRISE SUITE</small>
-                        </div>
-                    </div>
-
-                    <a href="#" class="db-create-btn">+ Create New</a>
-
-                    <nav class="db-menu">
-                        <a href="#" class="active">⌂ Home</a>
-                        <a href="createpage">✎ Create</a>
-                        <a href="publishpage">▦ Publish</a>
-                        <a href="#">▣ Templates</a>
-                        <a href="#">▬ Pricing</a>
-                    </nav>
-                    </div>
-
-                    <div>
-                    <div class="db-channels-head">
-                        <span>CONNECTED CHANNELS</span>
-                        <span>+</span>
-                    </div>
-                    <div class="db-channel-icons">
-                        <i>✻</i><i>◎</i><i>|</i><i>in</i><i>♪</i><i>▶</i>
-                    </div>
-
-                    <div class="db-user-card">
-                        <span class="db-avatar-light">MA</span>
-                        <div>
-                        <strong>M. R. Nusrath Ahamed</strong>
-                        <small>Free Plan</small>
-                        </div>
-                        <span class="db-dots">⋮</span>
-                    </div>
-                    </div>
-                </aside>
+                <Sidebar />
 
                 {/* <!-- Main --> */}
                 <main class="db-main">
