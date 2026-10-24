@@ -1,5 +1,7 @@
 import { useAuth } from "../AuthContext/authContext.jsx";
 import "./topBar.css";
+import ProfileMenu from "../profileMenu/profileMenu.jsx"
+
 
 function TopBar({
   title,
@@ -43,11 +45,9 @@ function TopBar({
         <button type="button" className="top-bar-bell" aria-label="Notifications">
           🔔
         </button>
-        <span className="top-bar-avatar">
-          {profilePicture
-            ? <img src={profilePicture} alt="" />
-            : initials}
-        </span>
+
+        <ProfileMenu direction="down" align="right" />
+        
       </div>
     </header>
   );

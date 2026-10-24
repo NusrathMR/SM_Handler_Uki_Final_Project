@@ -10,4 +10,4 @@ routes.post("/signup", registerUser)
 routes.post("/signin", userSignIn)
 routes.get("/me", protect, getMe)
 
-export default routes 
+export default routes

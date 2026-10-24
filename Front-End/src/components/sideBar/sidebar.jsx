@@ -1,5 +1,6 @@
 import "./sidebar.css"
 import { Link, NavLink } from "react-router-dom";
+import ProfileMenu from "../profileMenu/profileMenu.jsx"
 
 const links = [
   { name: "Home", icon: "⌂", to: "/dashboard" },
@@ -60,7 +61,7 @@ function Sidebar() {
 
         {/* User card */}
         <div className="db-user-card">
-          <span className="db-avatar-light">MA</span>
+          <ProfileMenu direction="up" align="left" size={40} />
           <div>
             <strong>M. R. Nusrat Ahmed</strong>
             <small>Free Plan</small>

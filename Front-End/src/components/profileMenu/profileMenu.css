@@ -1,0 +1,94 @@
+/* Wrapper: position relative lets the popup be placed against the avatar */
+.profile-menu {
+  position: relative;
+  display: inline-block;
+}
+
+/* Avatar button */
+.profile-menu .pm-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  overflow: hidden;         /* keeps a profile picture inside the circle */
+  padding: 0;
+}
+.profile-menu .pm-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The popup box */
+.profile-menu .pm-popup {
+  position: absolute;
+  z-index: 1000;            /* sits above the page content */
+  width: 260px;
+  padding: 8px;
+  background: #222222;
+  color: #f2f2f2;
+  border: 1px solid #333;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: left;
+}
+
+/* Where the popup opens */
+.profile-menu .pm-down  { top: calc(100% + 8px); }
+.profile-menu .pm-up    { bottom: calc(100% + 8px); }
+.profile-menu .pm-right { right: 0; }
+.profile-menu .pm-left  { left: 0; }
+
+/* Email and plan at the top */
+.profile-menu .pm-header { padding: 10px 10px 12px; }
+.profile-menu .pm-email  { font-size: 14px; font-weight: 600; word-break: break-all; }
+.profile-menu .pm-plan   { margin-top: 2px; font-size: 13px; color: #a0a0a0; }
+
+/* Upgrade button */
+.profile-menu .pm-upgrade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #2b2b2b;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.profile-menu .pm-upgrade:hover { background: #353535; }
+
+/* Thin line between groups */
+.profile-menu .pm-divider {
+  height: 1px;
+  margin: 6px 0;
+  background: #3a3a3a;
+}
+
+/* Menu rows */
+.profile-menu .pm-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px;
+  background: none;
+  color: #f2f2f2;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.profile-menu .pm-item:hover { background: #2f2f2f; }

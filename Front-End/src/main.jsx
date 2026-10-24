@@ -9,6 +9,7 @@ import CreatePage from './components/createPage/createPage.jsx'
 import PublishPage from './components/publishPage/publishPage.jsx'
 import { AuthProvider } from './components/AuthContext/authContext.jsx'
 import ProtectedRoute from './components/protectedRoute/protectedRoute.jsx'
+import ComingSoon from './components/comingSoon/comingSoon.jsx'
 
 const router = createBrowserRouter([
   {
@@ -34,7 +35,20 @@ const router = createBrowserRouter([
     {
     path:"/publishpage",
     element:(<ProtectedRoute><PublishPage/></ProtectedRoute>)
-  }
+  },
+  {
+  path: "/settings",
+  element: (<ProtectedRoute><ComingSoon title="Settings" /></ProtectedRoute>)
+  },
+  {
+  path: "/channels",
+  element: (<ProtectedRoute><ComingSoon title="Channels" /></ProtectedRoute>)
+  },
+  {
+  path: "/pricing",
+  element: (<ProtectedRoute><ComingSoon title="Pricing" /></ProtectedRoute>)
+  },
+  
 ])
 
 createRoot(document.getElementById('root')).render(
