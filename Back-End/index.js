@@ -4,6 +4,8 @@ import bodyParser from "body-parser"
 import connectDb from "./config/db.js"
 import userRoute from "./routes/userRoute.js"
 import cors from "cors"
+import postRoute from "./routes/postRoute.js"
+
 
 
 dotEnv.config()
@@ -15,7 +17,9 @@ connectDb()
 
 app.use(bodyParser.json())
 app.use(cors())
+
 app.use("/api/user", userRoute)
+app.use("/api/posts", postRoute)
 
 
 app.listen(PORT, ()=>{
