@@ -590,3 +590,32 @@
   color: #fff;
   border-color: #000;
 }
+
+/* Autosave error feedback */
+.cr-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.cr-error {
+  color: #963c3c;
+  background: #fff5f4;
+  border-color: #f3dfdc;
+}
+
+/* Recent drafts */
+.cr-empty { padding: 12px 0; font-size: 13px; color: #777; }
+.cr-draft { cursor: pointer; }
+button.cr-dots { background: none; border: none; font-size: 14px; color: inherit; cursor: pointer; }
+
+/* Content type cards are clickable */
+.cr-type { cursor: pointer; }
