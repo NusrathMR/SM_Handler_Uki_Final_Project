@@ -37,23 +37,34 @@ const postSchema = new mongoose.Schema(
 
         status: {
         type: String,
-        enum: ["draft", "scheduled", "published"],
+        enum: ["draft", "scheduled", "publishing", "published", "failed"],
         default: "draft",
         },
 
         scheduledAt: { type: Date, default: null },
         publishedAt: { type: Date, default: null },
+        publishError: { type:String, default:"" },
+        publishAttempts: { type:Number, default:0 },
         usedAI: { type: Boolean, default: false },
 
         branding: {
         watermark: { type: Boolean, default: false },
         footer: { type: Boolean, default: false },
         },
+
+        platformResults: [
+            {
+                platform: { type: String },
+                status: { type: String, enum: ["success", "failed"] },
+                error: { type: String, default: "" },
+            },
+        ],
     },
     { timestamps: true }  
 )
 
 postSchema.index({ owner: 1, status: 1, updatedAt: -1 })
+postSchema.index({ status: 1, scheduledAt: 1 })
 
 const Post = mongoose.model("Post", postSchema)
 

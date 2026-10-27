@@ -6,7 +6,12 @@ import {
   getPostById,
   updatePost,
   deletePost,
+  schedulePost,
+  unschedulePost,
+  publishNow
 } from "../controller/postController.js"
+
+
 
 const route = express.Router()
 
@@ -18,5 +23,8 @@ route.get("/", getMyPosts)
 route.get("/:id", getPostById)
 route.put("/:id", updatePost)
 route.delete("/:id", deletePost)
+route.patch("/:id/schedule", schedulePost)
+route.patch("/:id/unschedule", unschedulePost)
+route.post("/:id/publish-now", publishNow)
 
 export default route

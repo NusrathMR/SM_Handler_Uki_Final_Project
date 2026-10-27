@@ -1,9 +1,14 @@
 import mongoose from "mongoose"
 import Post from "../models/postModel.js"
+import { publishAndSave } from "../services/publisherServices.js"
 
 // The ONLY fields a client may send. Anything else is ignored.
 const ALLOWED_FIELDS = ["caption", "hashtags", "contentType", "platforms", "branding"]
-const STATUSES = ["draft", "scheduled", "published"]
+const STATUSES = ["draft", "scheduled", "publishing", "published", "failed"]
+const PLATFORMS = ["instagram", "facebook", "linkedin", "tiktok", "x"]
+const PUBLISHABLE = ["draft", "scheduled", "failed"]
+const ONE_MINUTE = 60 * 1000
+const ONE_YEAR = 365 * 24 * 60 * 60 * 1000
 
 // Helper 1: copy only the allowed fields from the request body
 const pickAllowedFields = (body = {}) => {
@@ -99,8 +104,8 @@ export const updatePost = async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: "Post not found..." })
     }
-    if (post.status === "published") {
-      return res.status(400).json({ message: "Published posts cannot be edited..." })
+    if (["publishing", "published"].includes(post.status)) {
+      return res.status(400).json({ message: "This post can no longer be edited..." })
     }
 
     post.set(pickAllowedFields(req.body))
@@ -124,3 +129,144 @@ export const deletePost = async (req, res) => {
     handleError(error, res)
   }
 }
+
+// PATCH /api/posts/:id/schedule  -> choose channels and a time
+export const schedulePost = async (req, res) => {
+  try {
+    const post = await findMyPost(req.params.id, req.user._id)
+    if (!post) {
+      return res.status(404).json({ message: "Post not found..." })
+    }
+
+    // Only these can be (re)scheduled
+    if (!["draft", "scheduled", "failed"].includes(post.status)) {
+      return res.status(400).json({ message: "This post cannot be scheduled right now..." })
+    }
+
+    const { platforms, scheduledAt } = req.body
+
+    // 1. Channels
+    if (!Array.isArray(platforms) || platforms.length === 0) {
+      return res.status(400).json({ message: "Select at least one channel..." })
+    }
+    const cleanPlatforms = [...new Set(platforms)]          // remove duplicates
+    if (!cleanPlatforms.every((p) => PLATFORMS.includes(p))) {
+      return res.status(400).json({ message: "One or more channels are not supported..." })
+    }
+
+    // 2. Content
+    if (!post.caption || post.caption.trim() === "") {
+      return res.status(400).json({ message: "Write a caption before scheduling..." })
+    }
+
+    // 3. Date and time
+    const when = new Date(scheduledAt)
+    if (!scheduledAt || Number.isNaN(when.getTime())) {
+      return res.status(400).json({ message: "Choose a valid date and time..." })
+    }
+    const now = Date.now()
+    if (when.getTime() < now - ONE_MINUTE) {
+      return res.status(400).json({ message: "The scheduled time must be in the future..." })
+    }
+    if (when.getTime() > now + ONE_YEAR) {
+      return res.status(400).json({ message: "You can schedule up to one year ahead..." })
+    }
+
+    // 4. Save
+    post.platforms = cleanPlatforms
+    post.scheduledAt = when
+    post.status = "scheduled"
+    post.publishError = ""
+    post.publishAttempts = 0
+    post.platformResults = []
+    await post.save()
+
+    res.status(200).json({ post })
+  } catch (error) {
+    handleError(error, res)
+  }
+}
+
+// PATCH /api/posts/:id/unschedule  -> cancel the schedule
+export const unschedulePost = async (req, res) => {
+  try {
+    const post = await findMyPost(req.params.id, req.user._id)
+    if (!post) {
+      return res.status(404).json({ message: "Post not found..." })
+    }
+    if (post.status !== "scheduled") {
+      return res.status(400).json({ message: "Only scheduled posts can be unscheduled..." })
+    }
+
+    post.status = "draft"
+    post.scheduledAt = null
+    await post.save()
+
+    res.status(200).json({ post })
+  } catch (error) {
+    handleError(error, res)
+  }
+}
+
+// POST /api/posts/:id/publish-now  -> publish immediately
+export const publishNow = async (req, res) => {
+  try {
+    const existing = await findMyPost(req.params.id, req.user._id)
+    if (!existing) {
+      return res.status(404).json({ message: "Post not found..." })
+    }
+
+    if (existing.status === "published") {
+      return res.status(400).json({ message: "This post is already published..." })
+    }
+    if (!PUBLISHABLE.includes(existing.status)) {
+      return res.status(400).json({ message: "This post cannot be published right now..." })
+    }
+
+    // Channels: from the request, otherwise the ones already on the post
+    const requested = req.body?.platforms ?? existing.platforms
+    if (!Array.isArray(requested) || requested.length === 0) {
+      return res.status(400).json({ message: "Select at least one channel..." })
+    }
+    const cleanPlatforms = [...new Set(requested)]
+    if (!cleanPlatforms.every((p) => PLATFORMS.includes(p))) {
+      return res.status(400).json({ message: "One or more channels are not supported..." })
+    }
+
+    if (!existing.caption || existing.caption.trim() === "") {
+      return res.status(400).json({ message: "Write a caption before publishing..." })
+    }
+
+    // CLAIM the post in one atomic step. If it is already being published
+    // (for example a double click), this finds nothing and we stop.
+    const post = await Post.findOneAndUpdate(
+      { _id: existing._id, owner: req.user._id, status: { $in: PUBLISHABLE } },
+      {
+        $set: {
+          status: "publishing",
+          platforms: cleanPlatforms,
+          scheduledAt: null,
+          publishError: "",
+        },
+        $inc: { publishAttempts: 1 },
+      },
+      { new: true }
+    )
+
+    if (!post) {
+      return res.status(409).json({ message: "This post is already being published..." })
+    }
+
+    await publishAndSave(post)
+
+    const message =
+      post.status === "published"
+        ? "Post published successfully..."
+        : `Publishing failed: ${post.publishError}`
+
+    res.status(200).json({ message, post })
+  } catch (error) {
+    handleError(error, res)
+  }
+}
+
