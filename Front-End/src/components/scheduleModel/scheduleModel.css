@@ -412,6 +412,17 @@
   font-weight: 500;
 }
 
+.sc-error {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #c62828;
+}
+
+.sc-error-bar {
+  margin: 0;
+  padding: 0 24px 12px;
+}
+
 /* Summary */
 .sc-summary {
   background: #f1f1f2;

@@ -104,36 +104,6 @@
   font-weight: 600;
 }
 
-/* Connected channels */
-.app-sidebar .db-channels-head {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: #aaa;
-  padding: 0 8px;
-  margin-bottom: 12px;
-}
-
-.app-sidebar .db-channel-icons {
-  display: flex;
-  gap: 8px;
-  padding: 0 8px;
-  margin-bottom: 20px;
-}
-
-.app-sidebar .db-channel-icons i {
-  width: 28px;
-  height: 28px;
-  background: #222;
-  border: 1px solid #333;
-  border-radius: 50%;
-  font-style: normal;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* User card */
 .app-sidebar .db-user-card {
   display: flex;

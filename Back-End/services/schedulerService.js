@@ -1,0 +1,88 @@
+import cron from "node-cron"
+import Post from "../models/postModel.js"
+import { publishAndSave } from "./publisherServices.js"
+
+const MAX_ATTEMPTS = 3                    // total tries per post
+const RETRY_DELAY_MS = 2 * 60 * 1000      // wait 2 minutes before a retry
+const STUCK_AFTER_MS = 5 * 60 * 1000      // a post "publishing" for over 5 minutes is stuck
+const BATCH_LIMIT = 10                    // at most 10 posts per check
+
+let isRunning = false                     // stops two checks from overlapping
+
+// ---------- 1. Rescue posts stuck in "publishing" ----------
+const recoverStuckPosts = async () => {
+  const cutoff = new Date(Date.now() - STUCK_AFTER_MS)
+
+  const result = await Post.updateMany(
+    { status: "publishing", updatedAt: { $lt: cutoff } },
+    {
+      $set: {
+        status: "failed",
+        publishError: "Publishing was interrupted. Please try again...",
+      },
+    }
+  )
+
+  if (result.modifiedCount > 0) {
+    console.log(`[scheduler] recovered ${result.modifiedCount} stuck post(s)`)
+  }
+}
+
+// ---------- 2. Publish every post that is due ----------
+const processDuePosts = async () => {
+  for (let i = 0; i < BATCH_LIMIT; i++) {
+    // Claim ONE due post. Only one process can win a given post.
+    const post = await Post.findOneAndUpdate(
+      { status: "scheduled", scheduledAt: { $lte: new Date() } },
+      {
+        $set: { status: "publishing", publishError: "" },
+        $inc: { publishAttempts: 1 },
+      },
+      { sort: { scheduledAt: 1 }, new: true }     // oldest first, return the updated post
+    )
+
+    if (!post) break                               // nothing left to do
+
+    console.log(`[scheduler] publishing post ${post._id} (try ${post.publishAttempts} of ${MAX_ATTEMPTS})`)
+
+    await publishAndSave(post)                     // sets "published" or "failed"
+
+    if (post.status === "failed" && post.publishAttempts < MAX_ATTEMPTS) {
+      // Put it back in the queue for a later retry
+      await Post.updateOne(
+        { _id: post._id },
+        {
+          $set: {
+            status: "scheduled",
+            scheduledAt: new Date(Date.now() + RETRY_DELAY_MS),
+          },
+        }
+      )
+      console.log(`[scheduler] post ${post._id} failed, will retry in ${RETRY_DELAY_MS / 60000} minute(s)`)
+    } else {
+      console.log(`[scheduler] post ${post._id} finished as "${post.status}"`)
+    }
+  }
+}
+
+// ---------- 3. One full check ----------
+export const runSchedulerTick = async () => {
+  if (isRunning) return                            // the previous check is still working
+  isRunning = true
+
+  try {
+    await recoverStuckPosts()
+    await processDuePosts()
+  } catch (error) {
+    console.error("[scheduler] error:", error)
+  } finally {
+    isRunning = false                              // always allow the next check
+  }
+}
+
+// ---------- 4. Start the timer ----------
+export const startScheduler = () => {
+  cron.schedule("* * * * *", runSchedulerTick)     // every minute
+  setTimeout(runSchedulerTick, 5000)               // and once, 5 seconds after startup
+  console.log("[scheduler] started: checking for due posts every minute")
+}

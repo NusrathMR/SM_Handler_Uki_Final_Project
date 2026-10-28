@@ -5,6 +5,7 @@ import connectDb from "./config/db.js"
 import userRoute from "./routes/userRoute.js"
 import cors from "cors"
 import postRoute from "./routes/postRoute.js"
+import { startScheduler } from "./services/schedulerService.js"
 
 
 
@@ -14,6 +15,7 @@ const app = express()
 const PORT = process.env.PORT || 8000
 
 connectDb()
+startScheduler()
 
 app.use(bodyParser.json())
 app.use(cors())

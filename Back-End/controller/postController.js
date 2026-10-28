@@ -5,6 +5,7 @@ import { publishAndSave } from "../services/publisherServices.js"
 // The ONLY fields a client may send. Anything else is ignored.
 const ALLOWED_FIELDS = ["caption", "hashtags", "contentType", "platforms", "branding"]
 const STATUSES = ["draft", "scheduled", "publishing", "published", "failed"]
+const SORTS = ["updatedAt", "-updatedAt", "scheduledAt", "-scheduledAt", "publishedAt", "-publishedAt"]
 const PLATFORMS = ["instagram", "facebook", "linkedin", "tiktok", "x"]
 const PUBLISHABLE = ["draft", "scheduled", "failed"]
 const ONE_MINUTE = 60 * 1000
@@ -56,29 +57,28 @@ export const getMyPosts = async (req, res) => {
   try {
     const page = Math.max(parseInt(req.query.page) || 1, 1)
     const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 50)
+    const sort = SORTS.includes(req.query.sort) ? req.query.sort : "-updatedAt"
 
     const filter = { owner: req.user._id }
     if (req.query.status) {
-      if (!STATUSES.includes(req.query.status)) {
+      const statuses = String(req.query.status).split(",")
+      if (!statuses.every((status) => STATUSES.includes(status))) {
         return res.status(400).json({ message: "Invalid status..." })
       }
-      filter.status = req.query.status
+      filter.status = { $in: statuses }
     }
 
     const [posts, total] = await Promise.all([
       Post.find(filter)
-        .sort({ updatedAt: -1 })
+        .sort(sort)
         .skip((page - 1) * limit)
         .limit(limit)
-        .select("contentType caption status platforms scheduledAt updatedAt")
+        .select("contentType caption hashtags status platforms scheduledAt publishedAt publishError publishAttempts platformResults createdAt updatedAt")
         .lean(),
       Post.countDocuments(filter),
     ])
 
-    // Send only a short preview of the caption in the list
-    const list = posts.map((p) => ({ ...p, caption: p.caption.slice(0, 100) }))
-
-    res.status(200).json({ posts: list, page, limit, total })
+    res.status(200).json({ posts, page, limit, total })
   } catch (error) {
     handleError(error, res)
   }
@@ -122,6 +122,9 @@ export const deletePost = async (req, res) => {
     const post = await findMyPost(req.params.id, req.user._id)
     if (!post) {
       return res.status(404).json({ message: "Post not found..." })
+    }
+    if (post.status === "publishing") {
+      return res.status(400).json({ message: "This post is being published right now. Try again in a moment..." })
     }
     await post.deleteOne()
     res.status(200).json({ message: "Post deleted successfully..." })
@@ -250,7 +253,7 @@ export const publishNow = async (req, res) => {
         },
         $inc: { publishAttempts: 1 },
       },
-      { new: true }
+      { returnDocument: "after" }
     )
 
     if (!post) {
@@ -269,4 +272,3 @@ export const publishNow = async (req, res) => {
     handleError(error, res)
   }
 }
-

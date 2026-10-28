@@ -6,11 +6,8 @@ const links = [
   { name: "Home", icon: "⌂", to: "/dashboard" },
   { name: "Create", icon: "✎", to: "/createpage" },
   { name: "Publish", icon: "▦", to: "/publishpage" },
-  { name: "Templates", icon: "▣" },
   { name: "Pricing", icon: "▬" },
 ];
-
-const channels = ["◎", "👍", "#", "▣", "♪", "▶"];
 
 function Sidebar() {
   return (
@@ -30,35 +27,14 @@ function Sidebar() {
         {/* Menu */}
         <nav className="db-menu">
           {links.map((link) => (
-            link.to ? (
-              <NavLink key={link.name} to={link.to}>
-                {link.icon} {link.name}
-              </NavLink>
-            ) : (
-              <Link
-                key={link.name}
-                to="#"
-                onClick={(event) => event.preventDefault()}
-              >
-                {link.icon} {link.name}
-              </Link>
-            )
+            <NavLink key={link.name} to={link.to}>
+              {link.icon} {link.name}
+            </NavLink>
           ))}
         </nav>
       </div>
 
       <div>
-        {/* Connected channels */}
-        <div className="db-channels-head">
-          <span>CONNECTED CHANNELS</span>
-          <span>+</span>
-        </div>
-        <div className="db-channel-icons">
-          {channels.map((icon, i) => (
-            <i key={i}>{icon}</i>
-          ))}
-        </div>
-
         {/* User card */}
         <div className="db-user-card">
           <ProfileMenu direction="up" align="left" size={40} />

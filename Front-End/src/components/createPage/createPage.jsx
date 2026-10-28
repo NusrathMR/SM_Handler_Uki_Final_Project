@@ -1,6 +1,6 @@
 import "./createPage.css"
 import { useState, useEffect, useRef } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams, useNavigate } from "react-router-dom"
 import api from "../../api/api.js"
 import Sidebar from "../sideBar/sidebar.jsx"
 import TopBar from "../topBar/topBar.jsx"
@@ -34,6 +34,7 @@ function draftTitle(caption) {
 function CreatePage() {
   // The address can contain ?draft=<id>, which means "open this draft"
   const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
   const draftId = searchParams.get("draft")
 
   // What the editor holds
@@ -42,6 +43,7 @@ function CreatePage() {
   const [postId, setPostId] = useState(null)        // null until the first save
   const lastSavedRef = useRef("|social_post")
   const savingRef = useRef(false)
+  const schedulingRef = useRef(false)
 
   // Save feedback
   const [saveStatus, setSaveStatus] = useState("idle")   // idle, saving, saved, error
@@ -55,6 +57,8 @@ function CreatePage() {
   // Popups
   const [showAI, setShowAI] = useState(false)
   const [showSchedule, setShowSchedule] = useState(false)
+  const [scheduling, setScheduling] = useState(false)
+  const [scheduleError, setScheduleError] = useState("")
 
   // ---------- Load the Recent Drafts list ----------
   const loadDrafts = async () => {
@@ -190,13 +194,47 @@ function CreatePage() {
     }
 
     const saved = await saveDraft()
-    if (saved) setShowSchedule(true)
+    if (saved) {
+      setScheduleError("")
+      setShowSchedule(true)
+    }
   }
 
-  function handleContinue(scheduleData) {
-    console.log("Schedule data:", scheduleData)
-    setShowSchedule(false)
-    // NEXT STEP: send scheduleData to the schedule endpoint, then go to the Publish page
+  async function handleContinue(scheduleData) {
+    if (!postId) {
+      setScheduleError("Save your draft first...")
+      return
+    }
+    if (schedulingRef.current) return
+
+    schedulingRef.current = true
+    setScheduling(true)
+    setScheduleError("")
+
+    try {
+      if (scheduleData.mode === "now") {
+        const response = await api.post(`/posts/${postId}/publish-now`, {
+          platforms: scheduleData.channels,
+        })
+        if (response.data.post.status === "failed") {
+          setScheduleError(response.data.message)
+          return
+        }
+      } else {
+        await api.patch(`/posts/${postId}/schedule`, {
+          platforms: scheduleData.channels,
+          scheduledAt: scheduleData.scheduledAt,
+        })
+      }
+
+      setShowSchedule(false)
+      navigate("/publishpage")
+    } catch (error) {
+      setScheduleError(error.response?.data?.message || "Something went wrong. Please try again.")
+    } finally {
+      schedulingRef.current = false
+      setScheduling(false)
+    }
   }
 
   const visibleDrafts = drafts.filter((d) => d.caption && d.caption.trim() !== "")
@@ -354,6 +392,9 @@ function CreatePage() {
                 {showSchedule && (
                   <ScheduleModal
                     postTitle={caption}
+                    postId={postId}
+                    busy={scheduling}
+                    errorMessage={scheduleError}
                     onClose={() => setShowSchedule(false)}
                     onBack={() => setShowSchedule(false)}
                     onContinue={handleContinue}

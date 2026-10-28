@@ -26,11 +26,32 @@ function formatTime(value) {
   return `${String(hour12).padStart(2, "0")}:${m} ${suffix}`;
 }
 
-function ScheduleModal({ postTitle, onClose, onBack, onContinue }) {
+function pad(n) {
+  return String(n).padStart(2, "0");
+}
+
+// A Date -> "2026-10-28" (local date, the format an <input type="date"> uses)
+function toDateInput(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// A Date -> "19:30" (local time, the format an <input type="time"> uses)
+function toTimeInput(d) {
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// Starting values: today, 15 minutes from now
+function defaultSchedule() {
+  const d = new Date(Date.now() + 15 * 60 * 1000);
+  return { date: toDateInput(d), time: toTimeInput(d) };
+}
+
+function ScheduleModal({ postTitle, postId, busy, errorMessage, onClose, onBack, onContinue }) {
   const [selected, setSelected] = useState(["instagram", "facebook", "linkedin"]);
   const [mode, setMode] = useState("later"); // "now" or "later"
-  const [date, setDate] = useState("2026-09-30");
-  const [time, setTime] = useState("19:30");
+  const [defaults] = useState(defaultSchedule);
+  const [date, setDate] = useState(defaults.date);
+  const [time, setTime] = useState(defaults.time);
 
   // Close with the Escape key
   useEffect(() => {
@@ -53,17 +74,25 @@ function ScheduleModal({ postTitle, onClose, onBack, onContinue }) {
     setSelected(allSelected ? [] : channelList.map((c) => c.id));
   }
 
-  const canContinue = selected.length > 0 && (mode === "now" || (date && time));
+// The chosen moment as a real Date (local time), or null for "Publish Now"
+const scheduledAt =
+  mode === "later" && date && time ? new Date(`${date}T${time}`) : null;
 
-  function handleContinue() {
-    onContinue({
-      channels: selected,
-      mode,
-      date: mode === "later" ? date : null,
-      time: mode === "later" ? time : null,
-    });
-  }
+// True when the chosen time has already passed
+const isPast = scheduledAt !== null && scheduledAt.getTime() < Date.now();
 
+const canContinue =
+  !busy && !isPast && selected.length > 0 && (mode === "now" || (date && time));
+
+function handleContinue() {
+  onContinue({
+    channels: selected,
+    mode,
+    date: mode === "later" ? date : null,
+    time: mode === "later" ? time : null,
+    scheduledAt: scheduledAt ? scheduledAt.toISOString() : null,   // UTC, ready for the server
+  });
+}
   return (
     <div className="sc-overlay" onClick={onClose}>
       <div className="sc-modal" onClick={(e) => e.stopPropagation()}>
@@ -96,7 +125,7 @@ function ScheduleModal({ postTitle, onClose, onBack, onContinue }) {
             <div className="sc-post-info">
               <div className="sc-post-meta">
                 <span className="sc-post-tag">SOCIAL POST</span>
-                <small className="mono">Draft #AZ04</small>
+                <small className="mono">Draft #{postId ? postId.slice(-4).toUpperCase() : "----"}</small>
               </div>
               <p>{postTitle || "Untitled post"}</p>
             </div>
@@ -187,7 +216,12 @@ function ScheduleModal({ postTitle, onClose, onBack, onContinue }) {
                       <div className="sc-fields">
                         <div>
                           <span className="sc-label mono">DATE</span>
-                          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                          <input
+                            type="date"
+                            value={date}
+                            min={toDateInput(new Date())}
+                            onChange={(e) => setDate(e.target.value)}
+                          />
                         </div>
                         <div>
                           <span className="sc-label mono">TIME</span>
@@ -198,6 +232,7 @@ function ScheduleModal({ postTitle, onClose, onBack, onContinue }) {
                         <span>◍ Local Timezone:</span>
                         <b className="mono">{Intl.DateTimeFormat().resolvedOptions().timeZone}</b>
                       </div>
+                      {isPast && <p className="sc-error">Choose a time in the future.</p>}
                     </div>
                   )}
                 </div>
@@ -224,15 +259,16 @@ function ScheduleModal({ postTitle, onClose, onBack, onContinue }) {
         </div>
 
         {/* Footer */}
+        {errorMessage && <p className="sc-error sc-error-bar">{errorMessage}</p>}
         <footer className="sc-footer">
-          <button type="button" className="sc-back" onClick={onBack}>← Back</button>
+          <button type="button" className="sc-back" disabled={busy} onClick={onBack}>← Back</button>
           <button
             type="button"
             className="sc-continue"
             disabled={!canContinue}
             onClick={handleContinue}
           >
-            Continue to Publish →
+            {busy ? "Working..." : mode === "now" ? "Publish Now →" : "Schedule Post →"}
           </button>
         </footer>
 
