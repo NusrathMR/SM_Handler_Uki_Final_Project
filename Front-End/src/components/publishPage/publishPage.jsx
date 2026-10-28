@@ -1,21 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/api.js";
 import Sidebar from "../sideBar/sidebar.jsx";
 import TopBar from "../topBar/topBar.jsx";
+import ScheduleModal from "../scheduleModel/scheduleModel.jsx";
 import "./publishPage.css";
 
 const tabs = ["Schedule", "Drafts", "Sent"];
 
-const initialPlatforms = [
-  { id: "instagram", name: "Instagram", icon: "◎", on: true },
-  { id: "facebook", name: "Facebook", icon: "👍", on: true },
-  { id: "x", name: "X", icon: "#", on: true },
-  { id: "linkedin", name: "LinkedIn", icon: "▣", on: true },
-  { id: "youtube", name: "YouTube", icon: "▶", on: false, disabled: true },
-];
-
 const PLATFORM_ICONS = { instagram: "◎", facebook: "👍", linkedin: "▣", x: "#", tiktok: "♪" };
+const PLATFORM_NAMES = { instagram: "Instagram", facebook: "Facebook", linkedin: "LinkedIn", x: "X", tiktok: "TikTok" };
 const STATUS_LABELS = { draft: "Draft", scheduled: "Scheduled", publishing: "Publishing", published: "Sent", failed: "Failed" };
+
+function formatPreviewDate(value) {
+  return value ? new Date(value).toLocaleString() : "";
+}
 
 function dayLabel(date) {
   const day = new Date(date);
@@ -31,7 +30,9 @@ function dayLabel(date) {
 }
 
 function toCard(post) {
-  const when = new Date(post.scheduledAt || post.publishedAt || post.updatedAt);
+  const when = new Date(post.status === "published"
+    ? post.publishedAt || post.scheduledAt || post.updatedAt
+    : post.scheduledAt || post.updatedAt);
   const caption = post.caption || "";
 
   return {
@@ -44,74 +45,175 @@ function toCard(post) {
     status: STATUS_LABELS[post.status] || post.status,
     icons: post.platforms.map((platform) => PLATFORM_ICONS[platform]).filter(Boolean).join(" "),
     img: null,
+    rawStatus: post.status,
+    platforms: post.platforms,
+    platformResults: post.platformResults,
+    publishError: post.publishError,
+    scheduledAt: post.scheduledAt,
+    publishedAt: post.publishedAt,
+    updatedAt: post.updatedAt,
   };
 }
 
 function PublishPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Schedule");
-  const [view, setView] = useState("list");           // "list" or "calendar"
+  const activeTabRef = useRef("Schedule");
   const [posts, setPosts] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [platforms, setPlatforms] = useState(initialPlatforms);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [scheduling, setScheduling] = useState(false);
+  const [scheduleError, setScheduleError] = useState("");
+  const [busyAction, setBusyAction] = useState(false);
+  const busyActionRef = useRef(false);
+  const schedulingRef = useRef(false);
 
-  async function loadPosts() {
+  async function loadPosts(tab = activeTab) {
+    if (activeTabRef.current !== tab) return;
+    const query = {
+      Schedule: "status=scheduled,publishing,failed&sort=scheduledAt",
+      Drafts: "status=draft&sort=-updatedAt",
+      Sent: "status=published&sort=-publishedAt",
+    }[tab];
+    setLoading(true);
     try {
-      const response = await api.get("/posts?status=scheduled,publishing&sort=scheduledAt&limit=50");
-      setPosts(response.data.posts.map(toCard));
+      const response = await api.get(`/posts?${query}&limit=50`);
+      if (activeTabRef.current !== tab) return;
+      const loadedPosts = response.data.posts.map(toCard);
+      setPosts(loadedPosts);
+      setSelectedId((currentId) =>
+        loadedPosts.some((post) => post.id === currentId) ? currentId : loadedPosts[0]?.id ?? null
+      );
       setLoadError(false);
     } catch (error) {
+      if (activeTabRef.current !== tab) return;
       console.error("Could not load posts", error);
       setLoadError(true);
     } finally {
-      setLoading(false);
+      if (activeTabRef.current === tab) setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadPosts();
-  }, []);
-
-  useEffect(() => {
-    if (posts.length === 0) {
-      setSelectedId(null);
-    } else if (!posts.some((post) => post.id === selectedId)) {
-      setSelectedId(posts[0].id);
-    }
-  }, [posts]);
+    loadPosts(activeTab);
+    const interval = setInterval(() => loadPosts(activeTab), 30000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
 
   // The post shown in the preview panel
   const selectedPost = posts.find((p) => p.id === selectedId);
 
   // Filter the list by the search text
   const visiblePosts = posts.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase())
+    p.text.toLowerCase().includes(search.toLowerCase())
   );
+
+  function showNotice(message) {
+    setNotice(message);
+  }
+
+  useEffect(() => {
+    if (!notice) return;
+    const timeout = setTimeout(() => setNotice(""), 4000);
+    return () => clearTimeout(timeout);
+  }, [notice]);
+
+  function changeTab(tab) {
+    if (activeTabRef.current === tab) return;
+    activeTabRef.current = tab;
+    setActiveTab(tab);
+    setPosts([]);
+    setSelectedId(null);
+  }
+
+  async function runRowAction(action) {
+    if (busyActionRef.current) return;
+    busyActionRef.current = true;
+    setBusyAction(true);
+    try {
+      await action();
+    } catch (error) {
+      showNotice(error.response?.data?.message || "Something went wrong. Please try again.");
+    } finally {
+      busyActionRef.current = false;
+      setBusyAction(false);
+    }
+  }
 
   async function deletePost(e, id) {
     e.stopPropagation();
     if (!window.confirm("Delete this post?")) return;
 
-    try {
+    await runRowAction(async () => {
       await api.delete(`/posts/${id}`);
-      loadPosts();
+      showNotice("Post deleted.");
+      await loadPosts();
+    });
+  }
+
+  async function unschedulePost(e, post) {
+    e.stopPropagation();
+    await runRowAction(async () => {
+      await api.patch(`/posts/${post.id}/unschedule`);
+      showNotice("Post moved back to drafts.");
+      if (activeTab === "Schedule") changeTab("Drafts");
+      else await loadPosts();
+    });
+  }
+
+  async function retryPost(e, post) {
+    e.stopPropagation();
+    await runRowAction(async () => {
+      const response = await api.post(`/posts/${post.id}/publish-now`);
+      if (response.data.post.status === "failed") {
+        showNotice(response.data.message);
+      } else {
+        showNotice("Post published.");
+      }
+      await loadPosts();
+    });
+  }
+
+  async function handleContinue(scheduleData) {
+    if (!selectedPost || schedulingRef.current) return;
+
+    schedulingRef.current = true;
+    setScheduling(true);
+    setScheduleError("");
+    try {
+      if (scheduleData.mode === "now") {
+        const response = await api.post(`/posts/${selectedPost.id}/publish-now`, {
+          platforms: scheduleData.channels,
+        });
+        if (response.data.post.status === "failed") {
+          setScheduleError(response.data.message);
+          await loadPosts();
+          return;
+        }
+        setShowSchedule(false);
+        showNotice("Post published.");
+        if (activeTab === "Sent") await loadPosts();
+        else changeTab("Sent");
+      } else {
+        await api.patch(`/posts/${selectedPost.id}/schedule`, {
+          platforms: scheduleData.channels,
+          scheduledAt: scheduleData.scheduledAt,
+        });
+        setShowSchedule(false);
+        showNotice("Post scheduled.");
+        if (activeTab === "Schedule") await loadPosts();
+        else changeTab("Schedule");
+      }
     } catch (error) {
-      alert(error.response?.data?.message || "Could not delete the post...");
+      setScheduleError(error.response?.data?.message || "Something went wrong. Please try again.");
+    } finally {
+      schedulingRef.current = false;
+      setScheduling(false);
     }
-  }
-
-  function togglePlatform(id) {
-    setPlatforms((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, on: !p.on } : p))
-    );
-  }
-
-  function handleSchedule() {
-    const channels = platforms.filter((p) => p.on).map((p) => p.id);
-    console.log("Schedule post:", selectedPost, "to", channels);
-    // call your API here
   }
 
   return (
@@ -137,7 +239,7 @@ function PublishPage() {
               className={activeTab === tab ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
-                setActiveTab(tab);
+                changeTab(tab);
               }}
             >
               {tab}
@@ -152,27 +254,18 @@ function PublishPage() {
             <div className="pb-head">
               <div>
                 <h2>{activeTab}</h2>
-                <p>Choose when you want to publish your content.</p>
-              </div>
-              <div className="pb-view">
-                <button
-                  type="button"
-                  className={view === "list" ? "active" : ""}
-                  onClick={() => setView("list")}
-                >
-                  ☰ List
-                </button>
-                <button
-                  type="button"
-                  className={view === "calendar" ? "active" : ""}
-                  onClick={() => setView("calendar")}
-                >
-                  ▦ Calendar
-                </button>
+                <p>
+                  {activeTab === "Schedule"
+                    ? "Posts waiting to be published."
+                    : activeTab === "Drafts"
+                      ? "Posts you have not scheduled yet."
+                      : "Posts that have been published."}
+                </p>
               </div>
             </div>
 
-            {view === "list" ? (
+            {notice && <p className="pb-notice">{notice}</p>}
+
               <div className="pb-list">
                 {visiblePosts.map((post) => (
                   <div
@@ -191,13 +284,27 @@ function PublishPage() {
                       <div className="pb-post-meta">
                         <span>{post.icons}</span>
                         <i>•</i>
-                        <span className="pb-status">{post.status}</span>
+                        <span className={"pb-status" + (post.rawStatus === "failed" ? " failed" : post.rawStatus === "published" ? " sent" : "")}>{post.status}</span>
                       </div>
                     </div>
                     <div className="pb-post-actions">
-                      <button type="button">✎</button>
-                      <button type="button" onClick={(e) => deletePost(e, post.id)}>🗑</button>
-                      <button type="button">⋮</button>
+                      {post.rawStatus !== "published" && post.rawStatus !== "publishing" && (
+                        <button
+                          type="button"
+                          disabled={busyAction}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/createpage?draft=${post.id}`);
+                          }}
+                        >✎</button>
+                      )}
+                      <button type="button" disabled={busyAction} onClick={(e) => deletePost(e, post.id)}>🗑</button>
+                      {post.rawStatus === "scheduled" && (
+                        <button type="button" className="pb-context-action" disabled={busyAction} onClick={(e) => unschedulePost(e, post)}>Unschedule</button>
+                      )}
+                      {post.rawStatus === "failed" && (
+                        <button type="button" className="pb-context-action" disabled={busyAction} onClick={(e) => retryPost(e, post)}>Retry</button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -206,18 +313,25 @@ function PublishPage() {
                 ) : loadError ? (
                   <p className="pb-empty">Could not load posts.</p>
                 ) : posts.length === 0 ? (
-                  <p className="pb-empty">No scheduled posts yet.</p>
+                  <p className="pb-empty">
+                    {activeTab === "Schedule" ? "No scheduled posts yet." : activeTab === "Drafts" ? "No drafts yet." : "No sent posts yet."}
+                  </p>
                 ) : visiblePosts.length === 0 ? (
                   <p className="pb-empty">No posts found.</p>
                 ) : null}
               </div>
-            ) : (
-              <p className="pb-empty">Calendar view coming soon.</p>
-            )}
 
-            <button type="button" className="pb-add">+ Add More Scheduled Posts</button>
+            <button type="button" className="pb-add" onClick={() => navigate("/createpage")}>+ Add More Scheduled Posts</button>
 
-            <button type="button" className="pb-schedule-btn" onClick={handleSchedule}>
+            <button
+              type="button"
+              className="pb-schedule-btn"
+              disabled={!selectedPost || selectedPost.rawStatus === "published" || selectedPost.rawStatus === "publishing"}
+              onClick={() => {
+                setScheduleError("");
+                setShowSchedule(true);
+              }}
+            >
               Schedule Post →
             </button>
           </div>
@@ -229,7 +343,16 @@ function PublishPage() {
               <div className="pb-panel">
                 <div className="pb-panel-head">
                   <h3>◉ Post Preview</h3>
-                  <a href="#">✎ Edit</a>
+                  {selectedPost.rawStatus !== "published" && selectedPost.rawStatus !== "publishing" && (
+                    <a
+                      href={`/createpage?draft=${selectedPost.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        navigate(`/createpage?draft=${selectedPost.id}`);
+                      }}
+                    >✎ Edit</a>
+                  )}
                 </div>
 
                 <div className="pb-preview">
@@ -237,12 +360,28 @@ function PublishPage() {
                     <span className="pb-preview-logo">✦</span>
                     <div>
                       <strong>Socialynk ✔</strong>
-                      <small>Just now</small>
+                      <small>
+                        {selectedPost.rawStatus === "scheduled"
+                          ? `Scheduled for ${formatPreviewDate(selectedPost.scheduledAt)}`
+                          : selectedPost.rawStatus === "published"
+                            ? `Sent on ${formatPreviewDate(selectedPost.publishedAt)}`
+                            : selectedPost.rawStatus === "draft"
+                              ? `Edited ${formatPreviewDate(selectedPost.updatedAt)}`
+                              : selectedPost.rawStatus === "failed"
+                                ? "Failed"
+                                : selectedPost.status}
+                      </small>
                     </div>
                     <span className="pb-preview-dots">···</span>
                   </div>
 
                   <p>{selectedPost.text}</p>
+                  {selectedPost.rawStatus === "failed" && selectedPost.publishError && (
+                    <p className="pb-error">{selectedPost.publishError}</p>
+                  )}
+                  {selectedPost.rawStatus === "scheduled" && selectedPost.publishError && (
+                    <p className="pb-error">Last attempt failed: {selectedPost.publishError}. It will retry automatically.</p>
+                  )}
 
                   {selectedPost.img && (
                     <div className="pb-preview-img">
@@ -254,49 +393,49 @@ function PublishPage() {
                     </div>
                   )}
 
-                  <div className="pb-preview-stats">
-                    <span>♡ 1.4K</span>
-                    <span>▭ 248</span>
-                    <span>➦ 89</span>
-                    <span className="pb-save">⚑</span>
-                  </div>
                 </div>
               </div>
             )}
 
             <div className="pb-platforms">
               <h4>Selected Platforms</h4>
-              {platforms.map((p) => (
-                <div key={p.id} className={"pb-platform" + (p.disabled ? " off" : "")}>
-                  <span>{p.icon} {p.name}</span>
-                  <label className="pb-switch">
-                    <input
-                      type="checkbox"
-                      checked={p.on}
-                      disabled={p.disabled}
-                      onChange={() => togglePlatform(p.id)}
-                    />
-                    <i></i>
-                  </label>
-                </div>
-              ))}
-            </div>
-
-            <div className="pb-reach">
-              <div className="pb-reach-top">
-                <h4>∿ Estimated Reach</h4>
-                <span className="pb-chip">+28.4%</span>
-              </div>
-              <p className="pb-reach-num">124.5K - 150K <small>Impressions</small></p>
-              <div className="pb-progress"><i></i></div>
-              <small className="pb-reach-note">
-                Based on your audience and platform activity over the last 30 days.
-              </small>
+              {selectedPost?.platforms.length ? (
+                selectedPost.platforms.map((platform) => {
+                  const result = selectedPost.platformResults?.find((item) => item.platform === platform);
+                  return (
+                    <div key={platform} className="pb-platform">
+                      <span>{PLATFORM_ICONS[platform]} {PLATFORM_NAMES[platform] || platform}</span>
+                      {result && (
+                        <small
+                          className={"pb-platform-result " + result.status}
+                          title={result.error || ""}
+                        >
+                          {result.status === "success" ? "Sent" : result.status === "failed" ? "Failed" : ""}
+                        </small>
+                      )}
+                    </div>
+                  );
+                })
+              ) : selectedPost ? (
+                <p className="pb-empty">No platforms selected yet.</p>
+              ) : null}
             </div>
 
           </aside>
         </div>
       </div>
+      {showSchedule && selectedPost && (
+        <ScheduleModal
+          postTitle={selectedPost.text}
+          postId={selectedPost.id}
+          busy={scheduling}
+          errorMessage={scheduleError}
+          onClose={() => setShowSchedule(false)}
+          onBack={() => setShowSchedule(false)}
+          onContinue={handleContinue}
+          initialChannels={selectedPost.platforms}
+        />
+      )}
     </div>
   );
 }

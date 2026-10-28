@@ -46,8 +46,8 @@ function defaultSchedule() {
   return { date: toDateInput(d), time: toTimeInput(d) };
 }
 
-function ScheduleModal({ postTitle, postId, busy, errorMessage, onClose, onBack, onContinue }) {
-  const [selected, setSelected] = useState(["instagram", "facebook", "linkedin"]);
+function ScheduleModal({ postTitle, postId, busy, errorMessage, onClose, onBack, onContinue, initialChannels }) {
+  const [selected, setSelected] = useState(initialChannels?.length ? initialChannels : ["instagram", "facebook", "linkedin"]);
   const [mode, setMode] = useState("later"); // "now" or "later"
   const [defaults] = useState(defaultSchedule);
   const [date, setDate] = useState(defaults.date);

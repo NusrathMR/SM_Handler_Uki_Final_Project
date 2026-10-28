@@ -1,8 +1,106 @@
 import "./dashBoard.css"
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/api.js"
 import Sidebar from "../sideBar/sidebar.jsx";
 import TopBar from "../topBar/topBar.jsx";
+import ScheduleModal from "../scheduleModel/scheduleModel.jsx";
+
+const PLATFORM_ICONS = { instagram: "◎", facebook: "👍", linkedin: "▣", x: "#", tiktok: "♪" };
+const PLATFORM_NAMES = { instagram: "Instagram", facebook: "Facebook", linkedin: "LinkedIn", x: "X", tiktok: "TikTok" };
 
 function DashBoard(){
+    const navigate = useNavigate();
+    const [stats, setStats] = useState({ scheduled: 0, drafts: 0, pending: 0 });
+    const [statsLoading, setStatsLoading] = useState(true);
+    const [statsError, setStatsError] = useState(false);
+    const [nextPost, setNextPost] = useState(null);
+    const [showSchedule, setShowSchedule] = useState(false);
+    const [scheduling, setScheduling] = useState(false);
+    const [scheduleError, setScheduleError] = useState("");
+    const [notice, setNotice] = useState("");
+    const schedulingRef = useRef(false);
+
+    async function loadStats() {
+        try {
+            const [scheduledResponse, draftsResponse] = await Promise.all([
+                api.get("/posts?status=scheduled,publishing&sort=scheduledAt&limit=50"),
+                api.get("/posts?status=draft&limit=1"),
+            ]);
+            const scheduledPosts = scheduledResponse.data.posts;
+            setNextPost(scheduledPosts[0] || null);
+            const dueBy = Date.now() + 24 * 60 * 60 * 1000;
+            const pendingCount = scheduledPosts.filter((post) =>
+                (post.status === "scheduled" || post.status === "publishing") &&
+                post.scheduledAt &&
+                new Date(post.scheduledAt).getTime() <= dueBy
+            ).length;
+
+            setStats({
+                scheduled: scheduledResponse.data.total,
+                drafts: draftsResponse.data.total,
+                pending: pendingCount === 50 && scheduledResponse.data.total > 50 ? "50+" : pendingCount,
+            });
+            setStatsError(false);
+        } catch (error) {
+            console.error("Could not load dashboard stats", error);
+            setNextPost(null);
+            setStatsError(true);
+        } finally {
+            setStatsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        const initialLoad = setTimeout(loadStats, 0);
+        const interval = setInterval(loadStats, 30000);
+        return () => {
+            clearTimeout(initialLoad);
+            clearInterval(interval);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!notice) return;
+        const timeout = setTimeout(() => setNotice(""), 4000);
+        return () => clearTimeout(timeout);
+    }, [notice]);
+
+    async function handleContinue(scheduleData) {
+        if (!nextPost || schedulingRef.current) return;
+
+        schedulingRef.current = true;
+        setScheduling(true);
+        setScheduleError("");
+        try {
+            if (scheduleData.mode === "now") {
+                const response = await api.post(`/posts/${nextPost._id}/publish-now`, {
+                    platforms: scheduleData.channels,
+                });
+                if (response.data.post.status === "failed") {
+                    setScheduleError(response.data.message);
+                    await loadStats();
+                    return;
+                }
+                setShowSchedule(false);
+                setNotice("Post published.");
+            } else {
+                await api.patch(`/posts/${nextPost._id}/schedule`, {
+                    platforms: scheduleData.channels,
+                    scheduledAt: scheduleData.scheduledAt,
+                });
+                setShowSchedule(false);
+                setNotice("Post rescheduled.");
+            }
+            await loadStats();
+        } catch (error) {
+            setScheduleError(error.response?.data?.message || "Something went wrong. Please try again.");
+        } finally {
+            schedulingRef.current = false;
+            setScheduling(false);
+        }
+    }
+
     return(
         <>
 
@@ -19,38 +117,32 @@ function DashBoard(){
                         subtitle="Create. Edit. Publish. Grow. All in one place."
                         searchShortcut="⌘K"
                     />
+                    {notice && <p className="db-notice">{notice}</p>}
 
                     {/* <!-- Stats --> */}
                     <section class="db-stats">
                     <div class="db-stat">
-                        <div class="db-stat-top"><span class="db-stat-icon">▣</span><span>···</span></div>
-                        <h2>2,000</h2>
-                        <p>Week Streak</p>
-                        <div class="db-stat-foot"><span class="db-chip">+12%</span> from last week</div>
+                        <div class="db-stat-top"><span class="db-stat-icon">◷</span><span>···</span></div>
+                        <h2>{statsLoading || statsError ? "—" : stats.scheduled}</h2>
+                        <p>Scheduled Posts</p>
+                        <div class="db-stat-foot">Waiting to be published</div>
                     </div>
 
                     <div class="db-stat">
                         <div class="db-stat-top"><span class="db-stat-icon">◎</span><span>···</span></div>
-                        <h2>1</h2>
-                        <p>Posting Goals</p>
-                        <div class="db-progress-text"><span>Completed</span><b>0 remaining</b></div>
-                        <div class="db-progress"><i></i></div>
-                    </div>
-
-                    <div class="db-stat">
-                        <div class="db-stat-top"><span class="db-stat-icon">▭</span><span>···</span></div>
-                        <h2>50</h2>
-                        <p>Comment Score</p>
-                        <div class="db-stat-foot"><span class="db-chip">+8%</span> from last week</div>
+                        <h2>{statsLoading || statsError ? "—" : stats.drafts}</h2>
+                        <p>Drafts</p>
+                        <div class="db-stat-foot">Not scheduled yet</div>
                     </div>
 
                     <div class="db-stat">
                         <div class="db-stat-top"><span class="db-stat-icon">▤</span><span>···</span></div>
-                        <h2>1</h2>
+                        <h2>{statsLoading || statsError ? "—" : stats.pending}</h2>
                         <p>Pending Posts</p>
-                        <div class="db-stat-foot"><span class="db-chip dark">1 scheduled</span> in queue</div>
+                        <div class="db-stat-foot">Due in the next 24 hours</div>
                     </div>
                     </section>
+                    {statsError && <p class="db-stats-error">Could not load</p>}
 
                     {/* <!-- Steps --> */}
                     <div class="db-section-head">
@@ -59,96 +151,95 @@ function DashBoard(){
                     </div>
 
                     <section class="db-steps">
-                    <div class="db-step">
+                    <a href="/createpage" class="db-step" onClick={(event) => { event.preventDefault(); navigate("/createpage"); }}>
                         <div class="db-step-top"><span class="db-step-num">01</span><span>→</span></div>
-                        <h4>Connect a channel</h4>
-                        <p>First, connect your social media pages to publish your content.</p>
-                        <div class="db-step-icons"><i>✻</i><i>X</i><i>in</i><i>◎</i></div>
-                        <a href="#" class="db-step-btn">Connect channels →</a>
-                    </div>
-
-                    <div class="db-step">
-                        <div class="db-step-top"><span class="db-step-num">02</span><span>→</span></div>
                         <h4>Create a post</h4>
                         <p>Create your social media content using the Socialynk editor.</p>
-                        <div class="db-step-lines"><i></i><i></i><i></i></div>
-                        <a href="#" class="db-step-btn">Go to create page →</a>
-                    </div>
+                        <div class="db-step-visual">▤</div>
+                        <span class="db-step-btn">Go to create page →</span>
+                    </a>
 
-                    <div class="db-step">
-                        <div class="db-step-top"><span class="db-step-num">03</span><span>✦</span></div>
+                    <a href="/aitools" class="db-step" onClick={(event) => { event.preventDefault(); navigate("/aitools"); }}>
+                        <div class="db-step-top"><span class="db-step-num">02</span><span>✦</span></div>
                         <h4>Explore AI tools</h4>
-                        <p>Improve your content, generate ideas and edit images with AI.</p>
-                        <div class="db-ai-box">◎ AI Assistant ready</div>
-                        <a href="#" class="db-step-btn">Explore AI tools →</a>
-                    </div>
+                        <p>See the AI features planned for your content workflow.</p>
+                        <div class="db-ai-box">◎ AI tools overview</div>
+                        <span class="db-step-btn">Explore AI tools →</span>
+                    </a>
                     </section>
 
-                    {/* <!-- Comments + Pending --> */}
-                    <div class="db-section-head">
-                    <h3>Comments and Pending Schedules</h3>
-                    </div>
-
                     <section class="db-bottom">
-
-                    <div class="db-box">
-                        <div class="db-box-head">
-                        <h4>▭ Latest Comments</h4>
-                        <a href="#">View all</a>
-                        </div>
-
-                        <div class="db-comment">
-                        <span class="db-avatar-light">AP</span>
-                        <div class="db-comment-text">
-                            <strong>Ayesha Perera <small>2h ago</small></strong>
-                            <p>Nice post! Keep going! 👏</p>
-                        </div>
-                        <span>···</span>
-                        </div>
-
-                        <div class="db-comment">
-                        <span class="db-avatar-light">KS</span>
-                        <div class="db-comment-text">
-                            <strong>Kasun Silva <small>4h ago</small></strong>
-                            <p>Great content! 🔥</p>
-                        </div>
-                        <span>···</span>
-                        </div>
-
-                        <div class="db-comment">
-                        <span class="db-avatar-light">TJ</span>
-                        <div class="db-comment-text">
-                            <strong>Tharindu Jayawardena <small>6h ago</small></strong>
-                            <p>This is so helpful. Thank you!</p>
-                        </div>
-                        <span>···</span>
+                    <div class="db-ad">
+                        <div class="db-ad-content">
+                            <small class="db-ad-label">SOCIALYNK</small>
+                            <h3>Create Once. Improve with AI. Publish Everywhere.</h3>
+                            <p>Your ideas, drafts and schedule in one calm workspace.</p>
+                            <div class="db-ad-chips">
+                                <span>Autosaved drafts</span>
+                                <span>Smart scheduling</span>
+                                <span>One-click publishing</span>
+                            </div>
+                            <button type="button" onClick={() => navigate("/createpage")}>Create a post →</button>
                         </div>
                     </div>
 
                     <div class="db-box">
                         <div class="db-box-head">
-                        <h4>▷ Pending Posts</h4>
-                        <span class="db-chip dark">Scheduled</span>
+                        <h4>▷ Next Scheduled Post</h4>
+                        {nextPost && <span class="db-chip dark">Scheduled</span>}
                         </div>
 
-                        <div class="db-post-image">
-                        <img src="https://picsum.photos/600/300?grayscale" alt="Post image"/>
-                        <span class="db-attached">▣ 1 Image Attached</span>
-                        </div>
-
-                        <h5>The Future of Technology</h5>
-                        <p class="db-post-text">The future of technology is closer than you think. Let's build it together.</p>
-                        <p class="db-post-date">◷ October 1, 2026 · 10:00 AM</p>
-
-                        <div class="db-post-buttons">
-                        <a href="#" class="db-btn-light">Edit Post</a>
-                        <a href="#" class="db-btn-dark">Reschedule</a>
-                        </div>
+                        {statsLoading ? (
+                            <p class="db-preview-empty">Loading preview...</p>
+                        ) : statsError ? (
+                            <p class="db-preview-empty">Could not load the preview.</p>
+                        ) : nextPost ? (
+                            <>
+                                <p class="db-post-text">{nextPost.caption}</p>
+                                <div class="db-preview-platforms">
+                                    {nextPost.platforms.map((platform) => (
+                                        <span key={platform}>{PLATFORM_ICONS[platform]} {PLATFORM_NAMES[platform] || platform}</span>
+                                    ))}
+                                </div>
+                                <p class="db-post-date">◷ Scheduled for {new Date(nextPost.scheduledAt).toLocaleString()}</p>
+                                {nextPost.publishError && (
+                                    <p class="db-preview-error">Last attempt failed: {nextPost.publishError}. It will retry automatically.</p>
+                                )}
+                                <div class="db-post-buttons">
+                                    <button type="button" class="db-btn-light" onClick={() => navigate(`/createpage?draft=${nextPost._id}`)}>Edit post</button>
+                                    <button
+                                        type="button"
+                                        class="db-btn-dark"
+                                        onClick={() => {
+                                            setScheduleError("");
+                                            setShowSchedule(true);
+                                        }}
+                                    >Reschedule</button>
+                                </div>
+                            </>
+                        ) : (
+                            <div class="db-preview-empty">
+                                <p>No scheduled posts yet.</p>
+                                <button type="button" class="db-btn-dark" onClick={() => navigate("/createpage")}>Create a post</button>
+                            </div>
+                        )}
                     </div>
 
                     </section>
                 </main>
             </div>
+            {showSchedule && nextPost && (
+                <ScheduleModal
+                    postTitle={nextPost.caption}
+                    postId={nextPost._id}
+                    initialChannels={nextPost.platforms}
+                    busy={scheduling}
+                    errorMessage={scheduleError}
+                    onClose={() => setShowSchedule(false)}
+                    onBack={() => setShowSchedule(false)}
+                    onContinue={handleContinue}
+                />
+            )}
         </>
     )
 }

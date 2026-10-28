@@ -10,6 +10,7 @@ import PublishPage from './components/publishPage/publishPage.jsx'
 import { AuthProvider } from './components/AuthContext/authContext.jsx'
 import ProtectedRoute from './components/protectedRoute/protectedRoute.jsx'
 import ComingSoon from './components/comingSoon/comingSoon.jsx'
+import AiToolsPage from './components/aiToolsPage/aiToolsPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
     path:"/publishpage",
     element:(<ProtectedRoute><PublishPage/></ProtectedRoute>)
   },
+    {
+      path: "/aitools",
+      element: (<ProtectedRoute><AiToolsPage /></ProtectedRoute>)
+    },
   {
   path: "/settings",
   element: (<ProtectedRoute><ComingSoon title="Settings" /></ProtectedRoute>)

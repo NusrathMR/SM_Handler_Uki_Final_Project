@@ -38,7 +38,7 @@ const processDuePosts = async () => {
         $set: { status: "publishing", publishError: "" },
         $inc: { publishAttempts: 1 },
       },
-      { sort: { scheduledAt: 1 }, new: true }     // oldest first, return the updated post
+      { sort: { scheduledAt: 1 }, returnDocument: "after" }     // oldest first, return the updated post
     )
 
     if (!post) break                               // nothing left to do
