@@ -1,39 +1,31 @@
 import { useState, useEffect, useRef } from "react";
 import "./aiAssistant.css";
 
+const API_URL = "http://localhost:3000/api/ai/generate-caption";
 const chips = ["✦ Generate Caption", "◎ Improve Hook", "✓ Fix Grammar", "# Hashtags", "Fix Tone"];
 
-// First messages shown when the popup opens
-const startMessages = [
-  {
-    id: 1,
-    role: "user",
-    text: "Help me rewrite this launch post for LinkedIn and Instagram. Make it more engaging, punchy, and include strong hooks.",
-    time: "Just now",
-  },
-  {
-    id: 2,
-    role: "ai",
-    time: "10s ago",
-    intro: "Here are 2 high-converting variations tailored for your audience, ready to insert directly into your draft:",
-    option: {
-      title: "Option 1: Authority & Insight (LinkedIn / X)",
-      chars: "~380 characters",
-      lines: [
-        "Most teams spend 12+ hours every week juggling social tools and disconnected workflows.",
-        "We built Socialynk v2.4 to eliminate that friction completely: one unified workspace, AI-assisted copy, and native multi-network publishing in seconds.",
-        "What is your biggest roadblock when distributing content at scale? 👇",
-      ],
-      tags: "#SaaS #Productivity #ContentStrategy #SocialMediaMarketing",
-    },
-  },
-];
+function getCurrentTime() {
+  return new Date().toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
 function AiAssistant({ onClose, onUseInEditor }) {
-  const [messages, setMessages] = useState(startMessages);
+  const [messages, setMessages] = useState([
+    {
+      id: "welcome",
+      role: "ai",
+      text: "Hi! What would you like help creating?",
+      time: getCurrentTime(),
+      welcome: true,
+    },
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
   const chatEndRef = useRef(null);
+  const copiedTimeoutRef = useRef(null);
 
   // Close with the Escape key
   useEffect(() => {
@@ -44,41 +36,85 @@ function AiAssistant({ onClose, onUseInEditor }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
+  useEffect(() => {
+    return () => window.clearTimeout(copiedTimeoutRef.current);
+  }, []);
+
   // Scroll to the newest message
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  function sendMessage() {
+  async function sendMessage() {
     const text = input.trim();
     if (!text || loading) return;
 
     setMessages((prev) => [
       ...prev,
-      { id: Date.now(), role: "user", text, time: "Just now" },
+      { id: `user-${Date.now()}`, role: "user", text, time: getCurrentTime() },
     ]);
     setInput("");
     setLoading(true);
 
-    // Fake AI reply. Replace this with your real API call.
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ prompt: text }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message || data?.error || `Request failed (${response.status}).`
+        );
+      }
+
+      if (typeof data?.suggestion !== "string") {
+        throw new Error("The server response did not include a suggestion.");
+      }
+
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now() + 1,
+          id: `ai-${Date.now()}`,
           role: "ai",
-          time: "Just now",
-          intro: "Here is an updated version based on your request:",
-          option: {
-            title: "Option 1: Short & Punchy",
-            chars: "~120 characters",
-            lines: ["Stop juggling tools. Start publishing. Socialynk puts everything in one place. 🚀"],
-            tags: "#SocialMedia #Productivity",
-          },
+          text: data.suggestion,
+          time: getCurrentTime(),
         },
       ]);
+    } catch (error) {
+      console.error("Could not generate a caption:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `ai-${Date.now()}`,
+          role: "ai",
+          text: error instanceof Error ? error.message : "Unable to generate a caption.",
+          time: getCurrentTime(),
+          error: true,
+        },
+      ]);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  }
+
+  async function copyMessage(messageId, text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      window.clearTimeout(copiedTimeoutRef.current);
+      setCopiedMessageId(messageId);
+      copiedTimeoutRef.current = window.setTimeout(() => {
+        setCopiedMessageId(null);
+      }, 2000);
+    } catch (error) {
+      console.error("Could not copy the AI response:", error);
+    }
   }
 
   function handleKeyDown(e) {
@@ -135,46 +171,56 @@ function AiAssistant({ onClose, onUseInEditor }) {
                   <strong>AI Assistant</strong>
                   <small>• {msg.time}</small>
                   <div className="ai-reply-tools">
-                    <button type="button">⧉</button>
+                    <button
+                      type="button"
+                      onClick={() => copyMessage(msg.id, msg.text)}
+                    >
+                      {copiedMessageId === msg.id ? "✓ Copied" : "⧉ Copy"}
+                    </button>
                     <button type="button">↻</button>
                   </div>
                 </div>
 
-                <p className="ai-intro">{msg.intro}</p>
+                {msg.error || msg.welcome ? (
+                  <p className={msg.error ? "ai-error ai-message-text" : "ai-message-text"}>
+                    {msg.text}
+                  </p>
+                ) : (
+                  <>
+                    <p className="ai-intro">Here is your generated caption:</p>
 
-                <div className="ai-option">
-                  <div className="ai-option-head">
-                    <div>
-                      <span className="ai-recommended">RECOMMENDED</span>
-                      <strong>{msg.option.title}</strong>
+                    <div className="ai-option">
+                      <div className="ai-option-head">
+                        <div>
+                          <span className="ai-recommended">RECOMMENDED</span>
+                          <strong>Generated caption</strong>
+                        </div>
+                        <small className="mono">{msg.text.length} characters</small>
+                      </div>
+
+                      <p className="ai-message-text">{msg.text}</p>
+
+                      <div className="ai-option-actions">
+                        <button
+                          type="button"
+                          className="ai-btn-dark"
+                          onClick={() => onUseInEditor(msg.text)}
+                        >
+                          ✓ Use in Editor
+                        </button>
+                        <button
+                          type="button"
+                          className="ai-btn-light"
+                          onClick={() => copyMessage(msg.id, msg.text)}
+                        >
+                          {copiedMessageId === msg.id ? "✓ Copied" : "⧉ Copy"}
+                        </button>
+                        <button type="button" className="ai-btn-light">⚙ Improve</button>
+                        <span className="ai-adapt">⎘ Adapt for Reels</span>
+                      </div>
                     </div>
-                    <small className="mono">{msg.option.chars}</small>
-                  </div>
-
-                  {msg.option.lines.map((line, i) => (
-                    <p key={i}>{line}</p>
-                  ))}
-                  <p className="ai-tags">{msg.option.tags}</p>
-
-                  <div className="ai-option-actions">
-                    <button
-                      type="button"
-                      className="ai-btn-dark"
-                      onClick={() => onUseInEditor(msg.option.lines.join("\n\n") + "\n\n" + msg.option.tags)}
-                    >
-                      ✓ Use in Editor
-                    </button>
-                    <button
-                      type="button"
-                      className="ai-btn-light"
-                      onClick={() => navigator.clipboard.writeText(msg.option.lines.join("\n\n"))}
-                    >
-                      ⧉ Copy
-                    </button>
-                    <button type="button" className="ai-btn-light">⚙ Improve</button>
-                    <span className="ai-adapt">⎘ Adapt for Reels</span>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             )
           )}
@@ -197,12 +243,19 @@ function AiAssistant({ onClose, onUseInEditor }) {
             <div className="ai-input-bar">
               <div className="ai-input-left">
                 <button type="button" className="ai-icon-btn">⌀</button>
-                <button type="button" className="ai-select">🌐 All Platforms ⌄</button>
+                <button type="button" className="ai-select">🌐 All Platforms</button>
                 <button type="button" className="ai-plain">≡ Tone</button>
               </div>
               <div className="ai-input-right">
                 <span>Press Enter ↵</span>
-                <button type="button" className="ai-send" onClick={sendMessage}>↑</button>
+                <button
+                  type="button"
+                  className="ai-send"
+                  onClick={sendMessage}
+                  disabled={loading || !input.trim()}
+                >
+                  ↑
+                </button>
               </div>
             </div>
           </div>

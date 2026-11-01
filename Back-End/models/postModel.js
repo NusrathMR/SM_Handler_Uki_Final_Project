@@ -59,6 +59,12 @@ const postSchema = new mongoose.Schema(
                 error: { type: String, default: "" },
             },
         ],
+        media: [
+            {
+                url: String,
+                publishId: String
+            }
+        ]
     },
     { timestamps: true }  
 )
