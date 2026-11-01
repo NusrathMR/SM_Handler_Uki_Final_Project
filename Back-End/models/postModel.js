@@ -62,7 +62,7 @@ const postSchema = new mongoose.Schema(
         media: [
             {
                 url: String,
-                publishId: String
+                publicId: String
             }
         ]
     },

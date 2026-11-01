@@ -3,7 +3,7 @@ import Post from "../models/postModel.js"
 import { publishAndSave } from "../services/publisherServices.js"
 
 // The ONLY fields a client may send. Anything else is ignored.
-const ALLOWED_FIELDS = ["caption", "hashtags", "contentType", "platforms", "branding"]
+const ALLOWED_FIELDS = ["caption", "hashtags", "contentType", "platforms", "branding", "media"]
 const STATUSES = ["draft", "scheduled", "publishing", "published", "failed"]
 const SORTS = ["updatedAt", "-updatedAt", "scheduledAt", "-scheduledAt", "publishedAt", "-publishedAt"]
 const PLATFORMS = ["instagram", "facebook", "linkedin", "tiktok", "x"]
@@ -73,7 +73,7 @@ export const getMyPosts = async (req, res) => {
         .sort(sort)
         .skip((page - 1) * limit)
         .limit(limit)
-        .select("contentType caption hashtags status platforms scheduledAt publishedAt publishError publishAttempts platformResults createdAt updatedAt")
+        .select("contentType caption hashtags media status platforms scheduledAt publishedAt publishError publishAttempts platformResults createdAt updatedAt")
         .lean(),
       Post.countDocuments(filter),
     ])

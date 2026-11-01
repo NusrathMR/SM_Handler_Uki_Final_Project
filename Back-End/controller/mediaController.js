@@ -71,3 +71,26 @@ export const deleteMedia = async (req, res) => {
         res.status(500).json({ message: "Could not delete image" });
     }
 };
+
+// DELETE /api/media by publicId
+export const deleteMediaByPublicId = async (req, res) => {
+    try {
+        const { publicId } = req.body;
+        if (!publicId) {
+            return res.status(400).json({ message: "publicId is required" });
+        }
+
+        const media = await Media.findOne({ publicId, user: req.user.id });
+        if (!media) {
+            return res.status(404).json({ message: "Image not found" });
+        }
+
+        await cloudinary.uploader.destroy(publicId);
+        await media.deleteOne();
+
+        res.status(200).json({ message: "Image deleted" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Could not delete image" });
+    }
+};

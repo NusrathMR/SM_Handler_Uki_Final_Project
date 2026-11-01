@@ -1,7 +1,7 @@
 import "./createPage.css"
 import { useState, useEffect, useRef } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
-import api from "../../api/api.js"
+import api, { uploadImage, deleteImage } from "../../api/api.js"
 import Sidebar from "../sideBar/sidebar.jsx"
 import TopBar from "../topBar/topBar.jsx"
 import AIAssistantModal from "../aiAssistant/aiAssistant.jsx"
@@ -40,8 +40,16 @@ function CreatePage() {
   // What the editor holds
   const [caption, setCaption] = useState("")
   const [contentType, setContentType] = useState("social_post")
+  const [images, setImages] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
+  const [removingId, setRemovingId] = useState("")
   const [postId, setPostId] = useState(null)        // null until the first save
-  const lastSavedRef = useRef("|social_post")
+  const lastSavedRef = useRef(JSON.stringify({
+    caption: "",
+    contentType: "social_post",
+    media: [],
+  }))
   const savingRef = useRef(false)
   const schedulingRef = useRef(false)
 
@@ -88,10 +96,16 @@ function CreatePage() {
       try {
         const response = await api.get(`/posts/${draftId}`)
         const post = response.data.post
-        lastSavedRef.current = post.caption + "|" + post.contentType
+        const postMedia = post.media || []
+        lastSavedRef.current = JSON.stringify({
+          caption: post.caption,
+          contentType: post.contentType,
+          media: postMedia,
+        })
         setPostId(post._id)
         setCaption(post.caption)
         setContentType(post.contentType)
+        setImages(postMedia)
         setSaveStatus("idle")
         setErrorMessage("")
       } catch (error) {
@@ -105,20 +119,20 @@ function CreatePage() {
 
   // ---------- Autosave changed content ----------
   useEffect(() => {
-    const current = caption + "|" + contentType
+    const current = JSON.stringify({ caption, contentType, media: images })
     if (current === lastSavedRef.current) return
     if (saveStatus === "saving") return
     if (saveStatus === "error") return
-    if (!postId && caption.trim().length < 3) return
+    if (!postId && caption.trim().length < 3 && images.length === 0) return
 
     const timeout = setTimeout(() => saveDraft(), 1500)
     return () => clearTimeout(timeout)
-  }, [caption, contentType, saveStatus, postId])
+  }, [caption, contentType, images, saveStatus, postId])
 
   // ---------- Save (create the first time, update afterwards) ----------
   // Returns the saved post, or null if saving failed
   async function saveDraft() {
-    if (!postId && caption.trim() === "") {
+    if (!postId && caption.trim() === "" && images.length === 0) {
       setErrorMessage("Write something before you save...")
       return null
     }
@@ -129,7 +143,7 @@ function CreatePage() {
     setErrorMessage("")
 
     try {
-      const body = { caption, contentType }
+      const body = { caption, contentType, media: images }
       let savedPost
 
       if (postId) {
@@ -141,7 +155,7 @@ function CreatePage() {
         setPostId(savedPost._id)       // remember it, so the next save updates
       }
 
-      lastSavedRef.current = caption + "|" + contentType
+      lastSavedRef.current = JSON.stringify({ caption, contentType, media: images })
       setSaveStatus("saved")
       loadDrafts()                     // refresh the Recent Drafts panel
       return savedPost
@@ -156,10 +170,15 @@ function CreatePage() {
 
   // ---------- Start a blank draft ----------
   const handleNewDraft = () => {
-    lastSavedRef.current = "|social_post"
+    lastSavedRef.current = JSON.stringify({
+      caption: "",
+      contentType: "social_post",
+      media: [],
+    })
     setPostId(null)
     setCaption("")
     setContentType("social_post")
+    setImages([])
     setSaveStatus("idle")
     setErrorMessage("")
     setSearchParams({})
@@ -238,6 +257,40 @@ function CreatePage() {
   }
 
   const visibleDrafts = drafts.filter((d) => d.caption && d.caption.trim() !== "")
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploadError("")
+    setUploading(true)
+
+    try {
+      const media = await uploadImage(file)
+      setImages((prev) => [...prev, media])
+    } catch (error) {
+      setUploadError(error.message)
+    } finally {
+      setUploading(false)
+      e.target.value = ""
+    }
+  }
+
+  const handleRemoveImage = async (image) => {
+    if (!window.confirm("Remove this image?")) return
+
+    setUploadError("")
+    setRemovingId(image.publicId)
+
+    try {
+      await deleteImage(image.publicId)
+      setImages((prev) => prev.filter((img) => img.publicId !== image.publicId))
+    } catch (error) {
+      setUploadError(error.message)
+    } finally {
+      setRemovingId("")
+    }
+  }
 
   return (
     <>
@@ -351,8 +404,34 @@ function CreatePage() {
                 <div className="cr-upload">
                   <span className="cr-upload-icon">☁</span>
                   <strong>Upload Image</strong>
-                  <p>Drag &amp; drop or <a href="#">Select a file</a></p>
+                  <input
+                    id="image-input"
+                    type="file"
+                    accept="image/png, image/jpeg, image/webp, image/jpg"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                  <p>Drag &amp; drop or <label htmlFor="image-input">Select a file</label></p>
                   <small>PNG, JPG, WebP up to 25MB</small>
+                  {uploading && <p>Uploading...</p>}
+                  {uploadError && <p className="cr-upload-error">{uploadError}</p>}
+                  <div className="cr-images">
+                    {images.map((img) => (
+                      <div
+                        className={removingId === img.publicId ? "cr-image-item removing" : "cr-image-item"}
+                        key={img.publicId || img.url}
+                      >
+                        <img src={img.url} alt="" className="cr-image" />
+                        <button
+                          type="button"
+                          className="cr-image-remove"
+                          onClick={() => handleRemoveImage(img)}
+                          disabled={removingId === img.publicId}
+                          aria-label="Remove image"
+                        >×</button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="cr-tool">
