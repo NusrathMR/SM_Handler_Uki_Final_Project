@@ -3,6 +3,7 @@ import { useState } from "react";
 import ForgotPasswordModal from "../forgetPassword/forgetPassword.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext/authContext.jsx";
+import { Link } from "react-router-dom";
 
 
 function LoginPage(){
@@ -188,7 +189,7 @@ function LoginPage(){
                     <b class="f-icon">f</b> Continue with Facebook
                     </button>
 
-                    <p class="signup-text">Don't have an account? <a href="#">Create an account</a></p>
+                    <p class="signup-text">Don't have an account? <Link to={"/signup"}>Create an account</Link></p>
                 </form>
                 </div>
 

@@ -1,8 +1,9 @@
 import "./sidebar.css"
 import { Link, NavLink } from "react-router-dom";
 import ProfileMenu from "../profileMenu/profileMenu.jsx"
+import { useAuth } from "../AuthContext/authContext.jsx"
 
-const links = [
+const baseLinks = [
   { name: "Home", icon: "⌂", to: "/dashboard" },
   { name: "Create", icon: "✎", to: "/createpage" },
   { name: "Publish", icon: "▦", to: "/publishpage" },
@@ -10,6 +11,11 @@ const links = [
 ];
 
 function Sidebar() {
+  const { user } = useAuth()
+  const links = user?.role === "admin"
+    ? [...baseLinks, { name: "Admin", icon: "⚙", to: "/admin" }]
+    : baseLinks
+
   return (
     <aside className="app-sidebar">
       <div>

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./signupPage.css"
 import { useState } from "react";
 
@@ -84,7 +85,7 @@ function SignupPage(){
 
                 {/* <!-- Right panel --> */}
                 <main class="su-right">
-                    <p class="su-login-link">Already have an account? <a href="#">Log in</a></p>
+                    <p class="su-login-link">Already have an account? <Link to={"/login"}>Log in</Link></p>
 
                     <div class="su-form-wrap">
                     <h2>Create your account</h2>

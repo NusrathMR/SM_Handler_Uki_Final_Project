@@ -8,6 +8,9 @@ import postRoute from "./routes/postRoute.js"
 import { startScheduler } from "./services/schedulerService.js"
 import aiRoute from "./routes/aiRoute.js"
 import mediaRoute from "./routes/mediaRoute.js"
+import adminUserRoute from "./routes/adminUserRoute.js"
+import adminDashboardRoute from "./routes/adminDashboardRoute.js"
+import adminSettingsRoute from "./routes/adminSettingsRoute.js"
 
 
 
@@ -26,6 +29,9 @@ app.use("/api/user", userRoute)
 app.use("/api/posts", postRoute)
 app.use("/api/ai", aiRoute)
 app.use("/api/media", mediaRoute)
+app.use("/api/admin/users", adminUserRoute)
+app.use("/api/admin/dashboard", adminDashboardRoute)
+app.use("/api/admin/settings", adminSettingsRoute)
 
 
 app.listen(PORT, ()=>{
