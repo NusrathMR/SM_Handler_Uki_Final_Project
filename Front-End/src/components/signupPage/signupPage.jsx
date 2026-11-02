@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import "./signupPage.css"
 import { useState } from "react";
+import api from "../../api/api.js"
 
 function SignupPage(){
 
@@ -19,18 +20,16 @@ function SignupPage(){
         setMessage("")
 
         try{
-            const response = await fetch("http://localhost:3000/api/user/signup",{
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body: JSON.stringify({
+            const response = await api.post("/user/signup", {
                     fullname: name,
                     email,
                     password,
                     confirmPassword,
-                })
+                }, {
+                    validateStatus: () => true,
             })
 
-            const result = await response.json()
+            const result = response.data
             setStatus(response.status);
             setMessage(result.message ?? result.error ?? "Unable to create account.")
 

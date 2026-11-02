@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./aiAssistant.css";
+import api from "../../api/api.js";
 
-const API_URL = "http://localhost:3000/api/ai/generate-caption";
 const chips = ["✦ Generate Caption", "◎ Improve Hook", "✓ Fix Grammar", "# Hashtags", "Fix Tone"];
 
 function getCurrentTime() {
@@ -57,18 +57,12 @@ function AiAssistant({ onClose, onUseInEditor }) {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ prompt: text }),
+      const response = await api.post("/ai/generate-caption", { prompt: text }, {
+        validateStatus: () => true,
       });
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok) {
+      if (response.status < 200 || response.status >= 300) {
         throw new Error(
           data?.message || data?.error || `Request failed (${response.status}).`
         );

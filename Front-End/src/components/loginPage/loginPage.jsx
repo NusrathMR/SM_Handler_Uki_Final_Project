@@ -4,6 +4,7 @@ import ForgotPasswordModal from "../forgetPassword/forgetPassword.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext/authContext.jsx";
 import { Link } from "react-router-dom";
+import api from "../../api/api.js"
 
 
 function LoginPage(){
@@ -24,21 +25,16 @@ function LoginPage(){
         setIsSubmitting(true)
 
         try{
-            const response = await fetch("http://localhost:3000/api/user/signin",{
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body: JSON.stringify({email,password})
-                
+            const response = await api.post("/user/signin", { email, password }, {
+                validateStatus: () => true,
             })
 
-            
-
-            const replay = await response.json()
+            const replay = response.data
             console.log("TOKEN:", replay.token)
             console.log("USER:", replay.user)
             setMessage(replay.message)
 
-            if(response.ok){
+            if(response.status >= 200 && response.status < 300){
             
                 login(replay.token, replay.user )
                 navigate("/dashboard", { replace: true })

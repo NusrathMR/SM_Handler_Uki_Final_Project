@@ -1,5 +1,5 @@
 ﻿import { createContext, useContext, useState, useEffect } from "react"
-import axios from "axios"
+import api from "../../api/api.js"
 
 const AuthContext = createContext()
 
@@ -45,9 +45,7 @@ export function AuthProvider({ children }) {
         const token = localStorage.getItem("token")
         if (!token) return
 
-        axios.get("http://localhost:3000/api/user/me", {
-            headers: { Authorization: "Bearer " + token },
-        }).then((response) => {
+        api.get("/user/me").then((response) => {
             const normalizedUser = normalizeUser(response.data.user)
             setUser(normalizedUser)
             localStorage.setItem("user", JSON.stringify(normalizedUser))
@@ -68,4 +66,3 @@ export function AuthProvider({ children }) {
 export const useAuth = () => {
     return useContext(AuthContext)
 }
-
