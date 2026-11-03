@@ -43,6 +43,13 @@ export const generateCaptionSuggestion = async (req, res) => {
       Date.now() - geminiStartedAt,
       "ms"
     ); // TEMP timing log, remove later
+
+    if (typeof suggestion !== "string" || !suggestion.trim()) {
+      return res.status(502).json({
+        message: "The AI returned an empty answer. Please try again.",
+      });
+    }
+
     return res.status(200).json({ suggestion });
   } catch (error) {
     if (error instanceof Error && error.message === "AI request timed out") {
@@ -51,7 +58,25 @@ export const generateCaptionSuggestion = async (req, res) => {
         .json({ message: "The AI took too long. Please try again." });
     }
 
-    console.error(error);
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    let errorMessage =
+      error instanceof Error ? error.message : String(error);
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (apiKey) {
+      errorMessage = errorMessage
+        .replaceAll(apiKey, "[REDACTED]")
+        .replaceAll(encodeURIComponent(apiKey), "[REDACTED]");
+    }
+    errorMessage = errorMessage.replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]");
+
+    // Check the terminal or Render logs for the real reason
+    console.error("AI generation failed:", {
+      name: errorName,
+      message: errorMessage,
+      status: error?.status,
+      code: error?.code,
+    });
     return res
       .status(500)
       .json({ message: "AI request failed. Please try again." });

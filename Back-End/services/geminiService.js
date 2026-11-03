@@ -21,9 +21,5 @@ export async function generateCaption({prompt}) {
 
   const suggestion = response.text?.trim();
 
-  if (!suggestion) {
-    throw new Error("Gemini returned an empty caption");
-  }
-
   return suggestion;
 }
