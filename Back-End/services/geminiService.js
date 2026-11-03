@@ -1,25 +1,36 @@
-import { GoogleGenAI, ThinkingLevel } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
-export async function generateCaption({prompt}) {
-  const { GEMINI_API_KEY, GEMINI_MODEL } = process.env;
+export async function generateCaption({ prompt } = {}) {
+  if (typeof prompt !== "string" || !prompt.trim()) {
+    const error = new Error("Prompt is missing");
+    error.status = 400;
+    throw error;
+  }
 
-  if (!GEMINI_API_KEY || !GEMINI_MODEL) {
-    throw new Error("GEMINI_API_KEY and GEMINI_MODEL must be set");
+  const { GEMINI_API_KEY } = process.env;
+  const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+
+  if (!GEMINI_API_KEY) {
+    const error = new Error("GEMINI_API_KEY must be set");
+    error.status = 500; // was 401
+    throw error;
   }
 
   const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
   const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
+    model,
     contents: prompt,
-    config: {
-      thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
-      systemInstruction:
-        "You write social media captions. Keep answers short (under 120 words) unless the user asks for more. Reply with the caption text only, with hashtags at the end when useful.",
-      maxOutputTokens: 1024,
-    },
   });
 
   const suggestion = response.text?.trim();
+
+
+  // Stop here if Gemini sent no text
+  if (!suggestion) {
+    const error = new Error("Gemini returned an empty answer");
+    error.status = 502;
+    throw error;
+  }
 
   return suggestion;
 }

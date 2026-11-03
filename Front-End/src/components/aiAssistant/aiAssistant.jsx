@@ -26,6 +26,7 @@ function AiAssistant({ onClose, onUseInEditor }) {
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const chatEndRef = useRef(null);
   const copiedTimeoutRef = useRef(null);
+  const lastPromptRef = useRef("");
 
   // Close with the Escape key
   useEffect(() => {
@@ -45,11 +46,13 @@ function AiAssistant({ onClose, onUseInEditor }) {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  async function sendMessage() {
-    const text = input.trim();
+  async function sendMessage(prompt = input.trim(), isRetry = false) {
+    const text = prompt.trim();
     if (loading) return;
+    if (!text) return;
 
-    if (text) {
+    if (!isRetry) {
+      lastPromptRef.current = text;
       setMessages((prev) => [
         ...prev,
         { id: `user-${Date.now()}`, role: "user", text, time: getCurrentTime() },
@@ -62,16 +65,14 @@ function AiAssistant({ onClose, onUseInEditor }) {
 
     try {
       const response = await generateCaption(text, controller.signal);
-      const data = response.data;
+      const data = await response.json();
 
-      if (response.status < 200 || response.status >= 300) {
-        throw new Error(
-          data?.message || data?.error || `Request failed (${response.status}).`
-        );
+      if (!response.ok) {
+        throw new Error(data?.message || "AI request failed. Please try again.");
       }
 
-      if (typeof data?.suggestion !== "string") {
-        throw new Error("The server response did not include a suggestion.");
+      if (typeof data?.caption !== "string") {
+        throw new Error("The server response did not include a caption.");
       }
 
       setMessages((prev) => [
@@ -79,7 +80,7 @@ function AiAssistant({ onClose, onUseInEditor }) {
         {
           id: `ai-${Date.now()}`,
           role: "ai",
-          text: data.suggestion,
+          text: data.caption,
           time: getCurrentTime(),
         },
       ]);
@@ -87,6 +88,8 @@ function AiAssistant({ onClose, onUseInEditor }) {
       const message =
         error?.name === "AbortError" || controller.signal.aborted
           ? "The AI took too long. Please try again."
+          : error instanceof TypeError
+            ? "Network error. Please check your connection and try again."
           : error instanceof Error
             ? error.message
             : "Unable to generate a caption.";
@@ -99,6 +102,7 @@ function AiAssistant({ onClose, onUseInEditor }) {
           text: message,
           time: getCurrentTime(),
           error: true,
+          retryable: true,
         },
       ]);
     } finally {
@@ -185,9 +189,21 @@ function AiAssistant({ onClose, onUseInEditor }) {
                 </div>
 
                 {msg.error || msg.welcome ? (
-                  <p className={msg.error ? "ai-error ai-message-text" : "ai-message-text"}>
-                    {msg.text}
-                  </p>
+                  <>
+                    <p className={msg.error ? "ai-error ai-message-text" : "ai-message-text"}>
+                      {msg.text}
+                    </p>
+                    {msg.retryable && (
+                      <button
+                        type="button"
+                        className="ai-btn-light"
+                        onClick={() => sendMessage(lastPromptRef.current, true)}
+                        disabled={loading}
+                      >
+                        Try again
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <>
                     <p className="ai-intro">Here is your generated caption:</p>

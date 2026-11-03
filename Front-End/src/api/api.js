@@ -15,14 +15,19 @@ api.interceptors.request.use((config) => {
 export default api
 
 export function generateCaption(prompt, signal) {
-  return api.post(
-    "/ai/generate-caption",
-    { prompt },
-    {
-      signal,
-      validateStatus: () => true,
-    }
-  )
+  const token = localStorage.getItem("token")
+  const headers = { "Content-Type": "application/json" }
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  return fetch(`${api.defaults.baseURL}/ai/generate-caption`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ prompt }),
+    signal,
+  })
 }
 
 export async function uploadImage(file) {
