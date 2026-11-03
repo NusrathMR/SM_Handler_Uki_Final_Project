@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "./aiAssistant.css";
-import api from "../../api/api.js";
+import { generateCaption } from "../../api/api.js";
 
 const chips = ["✦ Generate Caption", "◎ Improve Hook", "✓ Fix Grammar", "# Hashtags", "Fix Tone"];
 
@@ -47,19 +47,21 @@ function AiAssistant({ onClose, onUseInEditor }) {
 
   async function sendMessage() {
     const text = input.trim();
-    if (!text || loading) return;
+    if (loading) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { id: `user-${Date.now()}`, role: "user", text, time: getCurrentTime() },
-    ]);
+    if (text) {
+      setMessages((prev) => [
+        ...prev,
+        { id: `user-${Date.now()}`, role: "user", text, time: getCurrentTime() },
+      ]);
+    }
     setInput("");
     setLoading(true);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 45000);
 
     try {
-      const response = await api.post("/ai/generate-caption", { prompt: text }, {
-        validateStatus: () => true,
-      });
+      const response = await generateCaption(text, controller.signal);
       const data = response.data;
 
       if (response.status < 200 || response.status >= 300) {
@@ -82,18 +84,25 @@ function AiAssistant({ onClose, onUseInEditor }) {
         },
       ]);
     } catch (error) {
-      console.error("Could not generate a caption:", error);
+      const message =
+        error?.name === "AbortError" || controller.signal.aborted
+          ? "The AI took too long. Please try again."
+          : error instanceof Error
+            ? error.message
+            : "Unable to generate a caption.";
+      console.error("Could not generate a caption:", message);
       setMessages((prev) => [
         ...prev,
         {
           id: `ai-${Date.now()}`,
           role: "ai",
-          text: error instanceof Error ? error.message : "Unable to generate a caption.",
+          text: message,
           time: getCurrentTime(),
           error: true,
         },
       ]);
     } finally {
+      window.clearTimeout(timeoutId);
       setLoading(false);
     }
   }
@@ -246,7 +255,7 @@ function AiAssistant({ onClose, onUseInEditor }) {
                   type="button"
                   className="ai-send"
                   onClick={sendMessage}
-                  disabled={loading || !input.trim()}
+                  disabled={loading}
                 >
                   ↑
                 </button>

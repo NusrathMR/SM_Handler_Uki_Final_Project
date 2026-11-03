@@ -14,6 +14,16 @@ api.interceptors.request.use((config) => {
 
 export default api
 
+export function generateCaption(prompt, signal) {
+  return api.post(
+    "/ai/generate-caption",
+    { prompt },
+    {
+      signal,
+      validateStatus: () => true,
+    }
+  )
+}
 
 export async function uploadImage(file) {
   const formData = new FormData()

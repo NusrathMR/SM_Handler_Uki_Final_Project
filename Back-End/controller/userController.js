@@ -96,6 +96,7 @@ export const getMe = async (req, res) =>{
     res.status(200).json({
         user:{
             id:req.user._id,
+            name:req.user.fullname,
             email:req.user.email,
             role: req.user.role,
             plan:req.user.plan,

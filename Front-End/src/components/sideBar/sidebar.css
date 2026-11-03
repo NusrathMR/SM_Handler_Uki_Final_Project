@@ -117,11 +117,15 @@
 
 .app-sidebar .db-user-card div {
   flex: 1;
+  min-width: 0;
 }
 
 .app-sidebar .db-user-card strong {
   display: block;
   font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-sidebar .db-user-card small {

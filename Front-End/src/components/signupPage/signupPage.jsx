@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate, replace } from "react-router-dom";
 import "./signupPage.css"
 import { useState } from "react";
 import api from "../../api/api.js"
+import { useNavigate } from "react-router-dom";
 
 function SignupPage(){
 
@@ -12,6 +13,8 @@ function SignupPage(){
     const [message, setMessage] = useState("")
     const [status, setStatus] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const navigate = useNavigate()
 
     const handleCreateAccount = async (event)=>{
 
@@ -32,6 +35,8 @@ function SignupPage(){
             const result = response.data
             setStatus(response.status);
             setMessage(result.message ?? result.error ?? "Unable to create account.")
+
+            navigate("/login", {replace: true})
 
             if (response.ok){
                 setName("")

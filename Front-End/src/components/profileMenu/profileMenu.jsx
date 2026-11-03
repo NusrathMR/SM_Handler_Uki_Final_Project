@@ -10,7 +10,7 @@ function getInitials(email) {
   return email.split("@")[0].slice(0, 2).toUpperCase()
 }
 
-function ProfileMenu({ direction = "down", align = "right", size = 44 }) {
+function ProfileMenu({ direction = "down", align = "right", size = 44, avatarInitials }) {
   const [open, setOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -66,6 +66,8 @@ function ProfileMenu({ direction = "down", align = "right", size = 44 }) {
       >
         {user?.profilePicture ? (
           <img src={user.profilePicture} alt="Profile" />
+        ) : avatarInitials ? (
+          <span className="db-avatar-light">{avatarInitials}</span>
         ) : (
           getInitials(user?.email)
         )}

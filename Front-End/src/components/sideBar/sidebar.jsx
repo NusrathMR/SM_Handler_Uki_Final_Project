@@ -2,6 +2,8 @@ import "./sidebar.css"
 import { Link, NavLink } from "react-router-dom";
 import ProfileMenu from "../profileMenu/profileMenu.jsx"
 import { useAuth } from "../AuthContext/authContext.jsx"
+import getInitials from "../../utils/getInitials.js"
+import formatPlan from "../../utils/formatPlan.js"
 
 const baseLinks = [
   { name: "Home", icon: "⌂", to: "/dashboard" },
@@ -12,6 +14,9 @@ const baseLinks = [
 
 function Sidebar() {
   const { user } = useAuth()
+  const displayName = typeof user?.name === "string" && user.name.trim()
+    ? user.name.trim()
+    : "User"
   const links = user?.role === "admin"
     ? [...baseLinks, { name: "Admin", icon: "⚙", to: "/admin" }]
     : baseLinks
@@ -43,10 +48,15 @@ function Sidebar() {
       <div>
         {/* User card */}
         <div className="db-user-card">
-          <ProfileMenu direction="up" align="left" size={40} />
+          <ProfileMenu
+            direction="up"
+            align="left"
+            size={40}
+            avatarInitials={getInitials(user?.name)}
+          />
           <div>
-            <strong>M. R. Nusrat Ahmed</strong>
-            <small>Free Plan</small>
+            <strong title={displayName}>{displayName}</strong>
+            <small>{formatPlan(user?.plan)}</small>
           </div>
           <span className="db-dots">⇅</span>
         </div>
