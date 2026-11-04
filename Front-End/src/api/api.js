@@ -85,3 +85,33 @@ export async function saveAdminSettings(settings) {
 
   return response.data.settings
 }
+
+export async function getPublishedPosts() {
+  const limit = 50
+  const firstResponse = await api.get(
+    `/posts?status=published&sort=-publishedAt&limit=${limit}&page=1`,
+    { validateStatus: () => true }
+  )
+
+  if (firstResponse.status < 200 || firstResponse.status >= 300) {
+    throw new Error(firstResponse.data?.message || "Could not load posts")
+  }
+
+  const posts = firstResponse.data.posts
+  const totalPages = Math.ceil(firstResponse.data.total / limit)
+
+  for (let page = 2; page <= totalPages; page += 1) {
+    const response = await api.get(
+      `/posts?status=published&sort=-publishedAt&limit=${limit}&page=${page}`,
+      { validateStatus: () => true }
+    )
+
+    if (response.status < 200 || response.status >= 300) {
+      throw new Error(response.data?.message || "Could not load posts")
+    }
+
+    posts.push(...response.data.posts)
+  }
+
+  return posts
+}

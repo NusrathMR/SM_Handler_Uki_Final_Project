@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/api.js";
 import Sidebar from "../sideBar/sidebar.jsx";
 import TopBar from "../topBar/topBar.jsx";
@@ -262,6 +262,7 @@ function PublishPage() {
                       : "Posts that have been published."}
                 </p>
               </div>
+              <Link to="/simulator" className="pb-open-simulator">Open Simulator</Link>
             </div>
 
             {notice && <p className="pb-notice">{notice}</p>}

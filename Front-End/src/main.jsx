@@ -17,6 +17,7 @@ import AdminDashboard from './components/admin/adminDashboard.jsx'
 import ManageUsers from './components/admin/manageUsers.jsx'
 import AdminSettings from './components/admin/adminSettings.jsx'
 import AdminComingSoon from './components/admin/comingSoon.jsx'
+import SimulatorPage from './components/simulator/simulatorPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
     path:"/publishpage",
     element:(<ProtectedRoute><PublishPage/></ProtectedRoute>)
   },
+    {
+      path: "/simulator",
+      element: (<ProtectedRoute><SimulatorPage /></ProtectedRoute>)
+    },
     {
       path: "/aitools",
       element: (<ProtectedRoute><AiToolsPage /></ProtectedRoute>)

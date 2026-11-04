@@ -1,0 +1,434 @@
+.sim-main {
+  flex: 1;
+  min-width: 0;
+  background: #fafafa;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.sim-content {
+  min-height: calc(100vh - 65px);
+  padding: 20px;
+  background: #fafafa;
+}
+
+.sim-notice {
+  padding: 10px 12px;
+  background: #f4f4f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #333;
+}
+
+.sim-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.sim-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.sim-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.sim-tab,
+.sim-refresh,
+.sim-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sim-tab span {
+  color: #777;
+  font-size: 10px;
+}
+
+.sim-tab--active,
+.sim-tab--active span {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+}
+
+.sim-refresh {
+  font-weight: 600;
+}
+
+.sim-refresh:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.sim-state-text {
+  margin: 32px 0;
+  color: #777;
+  font-size: 13px;
+  text-align: center;
+}
+
+.sim-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.sim-error-retry {
+  flex-shrink: 0;
+  padding: 6px 9px;
+  color: #991b1b;
+  background: #fff;
+  border: 1px solid #fca5a5;
+  border-radius: 5px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sim-empty {
+  width: min(100%, 560px);
+  margin: 48px auto;
+  padding: 32px 20px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.sim-empty h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.sim-empty p {
+  margin: 0 0 18px;
+  color: #777;
+  font-size: 12px;
+}
+
+.sim-primary-button {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+  font-weight: 600;
+}
+
+.sim-feed {
+  width: min(100%, 560px);
+  margin: 0 auto;
+}
+
+.sim-feed-item + .sim-feed-item {
+  margin-top: 16px;
+}
+
+.sim-feed-platform {
+  margin: 0 0 7px 2px;
+  color: #777;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sim-card {
+  position: relative;
+  overflow: hidden;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.sim-card:hover {
+  transform: translateY(-3px);
+  border-color: #000;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.sim-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-right: 82px;
+}
+
+.sim-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  background: #000;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sim-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+
+.sim-user-info strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-user-info small {
+  overflow: hidden;
+  color: #777;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-platform-chip {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  color: #333;
+  font-size: 10px;
+}
+
+.sim-platform-chip span {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sim-badge {
+  position: absolute;
+  top: 57px;
+  right: 16px;
+  color: #777;
+  font-size: 9px;
+}
+
+.sim-caption {
+  margin: 0 0 12px;
+  color: #222;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.sim-hashtag {
+  color: #555;
+  font-weight: 600;
+}
+
+.sim-media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0 0 12px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.sim-media-grid--1 {
+  display: block;
+}
+
+.sim-media-item {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.sim-media-grid--1 .sim-media-item {
+  aspect-ratio: auto;
+}
+
+.sim-media-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.sim-card--instagram .sim-media-item img {
+  aspect-ratio: 1 / 1;
+}
+
+.sim-card--instagram .sim-media-grid--1 .sim-media-item {
+  aspect-ratio: 1 / 1;
+}
+
+.sim-media-more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.48);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.sim-instagram-likes {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sim-instagram-caption {
+  margin-bottom: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.sim-instagram-caption strong {
+  margin-right: 4px;
+}
+
+.sim-facebook-summary,
+.sim-linkedin-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  color: #777;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 10px;
+}
+
+.sim-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 4px;
+  padding-top: 10px;
+}
+
+.sim-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 5px;
+  background: transparent;
+  border: 0;
+  color: #555;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.sim-action-button > span:last-child:not(.sim-action-icon) {
+  color: #777;
+}
+
+.sim-action-button--liked {
+  color: #000;
+  font-weight: 600;
+}
+
+.sim-action-button--liked .sim-action-icon {
+  color: #000;
+}
+
+.sim-action-icon {
+  font-size: 13px;
+}
+
+.sim-x-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  color: #777;
+  font-size: 10px;
+}
+
+.sim-card--x .sim-card-header {
+  margin-bottom: 9px;
+}
+
+.sim-card--x .sim-caption {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .sim-content {
+    padding: 14px;
+  }
+
+  .sim-controls {
+    align-items: stretch;
+  }
+
+  .sim-refresh {
+    align-self: flex-start;
+  }
+
+  .sim-feed,
+  .sim-empty {
+    width: 100%;
+  }
+
+  .sim-card {
+    padding: 14px;
+  }
+
+  .sim-platform-chip {
+    top: 14px;
+    right: 14px;
+  }
+
+  .sim-badge {
+    right: 14px;
+  }
+
+  .sim-x-stats {
+    flex-wrap: wrap;
+  }
+}

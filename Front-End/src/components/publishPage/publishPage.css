@@ -55,6 +55,22 @@
   margin-top: 4px;
 }
 
+.pb-open-simulator {
+  flex-shrink: 0;
+  padding: 8px 11px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  color: #000;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pb-open-simulator:hover {
+  border-color: #000;
+}
+
 /* Post list */
 .pb-list {
   display: flex;
