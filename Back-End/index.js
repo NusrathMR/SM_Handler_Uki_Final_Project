@@ -1,5 +1,5 @@
 import express from "express"
-import dotEnv from "dotenv"
+import "dotenv/config"
 import bodyParser from "body-parser"
 import connectDb from "./config/db.js"
 import userRoute from "./routes/userRoute.js"
@@ -13,8 +13,6 @@ import adminDashboardRoute from "./routes/adminDashboardRoute.js"
 import adminSettingsRoute from "./routes/adminSettingsRoute.js"
 
 
-
-dotEnv.config()
 
 const app = express()
 const PORT = process.env.PORT || 8000
