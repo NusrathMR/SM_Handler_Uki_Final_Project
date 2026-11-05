@@ -302,18 +302,30 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
   padding-top: 12px;
   border-top: 1px solid #eee;
 }
 
 .ai-btn-dark,
 .ai-btn-light {
-  height: 26px;
-  padding: 0 10px;
-  border-radius: 4px;
-  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 0 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
+  vertical-align: middle;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .ai-btn-dark {
@@ -325,12 +337,34 @@
 .ai-btn-light {
   background: #fff;
   border: 1px solid #e5e5e5;
-  margin-top: 20px;
+  color: #000;
+}
+
+.ai-btn-copy {
+  min-width: 90px;
+}
+
+.ai-btn-dark:hover {
+  background: #222;
+}
+
+.ai-btn-light:hover {
+  border-color: #000;
+}
+
+.ai-btn-dark:focus-visible,
+.ai-btn-light:focus-visible {
+  outline: 2px solid #555;
+  outline-offset: 2px;
 }
 
 .ai-adapt {
   margin-left: auto;
-  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1;
   color: #777;
 }
 

@@ -229,7 +229,7 @@ function AiAssistant({ onClose, onUseInEditor }) {
                         </button>
                         <button
                           type="button"
-                          className="ai-btn-light"
+                          className="ai-btn-light ai-btn-copy"
                           onClick={() => copyMessage(msg.id, msg.text)}
                         >
                           {copiedMessageId === msg.id ? "✓ Copied" : "⧉ Copy"}
