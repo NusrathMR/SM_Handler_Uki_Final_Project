@@ -270,7 +270,7 @@ function AiAssistant({ onClose, onUseInEditor }) {
                 <button
                   type="button"
                   className="ai-send"
-                  onClick={sendMessage}
+                  onClick={() => sendMessage()}
                   disabled={loading}
                 >
                   ↑
